@@ -1,48 +1,23 @@
-
-SendToConsole("con_filter_enable 1")
-SendToConsole("con_filter_text_out Blocking")
-SendToConsole ("ent_fire tf_wearable* kill; clear;")
+NOT DONE YETT!!!
+//SendToConsole("con_filter_enable 1")
+//SendToConsole("con_filter_text_out Blocking")
+//SendToConsole ("ent_fire tf_wearable* kill; clear;")
 printl("Executing...GTFW!")
 
+/*
 ::logPass <- 0
 function logpass(name)
 {
 	logPass++
 	printl("Pass #"+logPass+" ["+name+"]")
 }
-function OnGameEvent_player_spawn(params)
-{
-    if ("userid" in params)
-    {
-		local player = GetPlayerFromUserID(params.userid)
-	}
-}
 ::ME <- GetListenServerHost()
-//if(!("PlayerRegenerateEventActive" in getroottable()))
-//{
-    __CollectEventCallbacks(this, "OnGameEvent_", "GameEventCallbacks", RegisterScriptGameEventListener)
-    //::PlayerRegenerateEventActive <- true
-//}
-
+*/
 //"post_inventory_application" sent when a player gets a whole new set of items, aka touches a resupply locker / respawn cabinet or spawns in.
 function OnGameEvent_post_inventory_application(params)
 {
-		for (local weapon; weapon = Entities.FindByClassname(weapon, "tf_weapon_*"); )
-		{
-			printl("WEARABLE "+weapon+" "+weapon.GetMoveParent())
-			printl(weapon+" "+NetProps.GetPropInt(weapon, "m_AttributeManager.m_Item.m_iEntityQuality")) //typically -1
-			printl(weapon+" "+NetProps.GetPropInt(weapon, "m_AttributeManager.m_Item.m_bInitialized")) //1
-			printl(weapon+" "+NetProps.GetPropInt(weapon, "m_AttributeManager.m_Item.m_bOnlyIterateItemViewAttributes")) //0, or 1 for GiveWeapons
-			printl(weapon+" "+NetProps.GetPropInt(weapon, "m_AttributeManager.m_iReapplyProvisionParity")) //3 or 5
-			printl(weapon+" "+NetProps.GetPropInt(weapon, "m_AttributeManager.m_ProviderType")) //1
-			printl(weapon+" "+NetProps.GetPropEntity(weapon, "m_AttributeManager.m_hOuter")) //typically self
-			printl(weapon+" "+NetProps.GetPropInt(weapon, "m_bClientSideAnimation")) //1
-			printl(weapon+" "+NetProps.GetPropEntity(weapon, "m_hOwnerEntity")) //
-			printl(weapon+" "+NetProps.GetPropInt(weapon, "m_hEffectEntity ")) //
-		}
-	
-    if ("userid" in params)
-    {
+	if ("userid" in params)
+	{
 		local player = GetPlayerFromUserID(params.userid)
 		player.GiveWeaponCleanup()
 		player.GTFW_ThinkScripts()
@@ -52,13 +27,38 @@ function OnGameEvent_post_inventory_application(params)
 		//	local melee = player.GiveWeapon("The Eyelander", -1)
 		//	player.SetCustomWeapon(melee, -1, GTFW_MODELS_CUSTOM_WEAPONS.DEMO_BIGAXE, GTFW_ARMS.DEMO, "cm_draw" )
 		}
-		if ( player.GetPlayerClass() == 8 )
-		{
-			local knife = player.GiveWeapon("Eyelander", -1)
-		//	local SpySword = player.SetCustomWeapon(knife, -1, "models/weapons/w_models/w_rapier_spy/w_rapier.mdl", GTFW_ARMS.SPY, "knife_draw" )
-		}
+
+	//	local knife = player.GiveWeapon("Bonk", -1)
+	//	knife.AddAttribute("max health additive bonus", -26, 1)
+	//	local SpySword = player.SetCustomWeapon(knife, -1, "models/weapons/w_models/w_rapier_spy/w_rapier.mdl", GTFW_ARMS.SPY, "knife_draw" )
+	//	NetProps.SetPropInt(player,"m_PlayerClass.m_iClass", 9)
+	
+	//	for (local weapon; weapon = Entities.FindByClassname(weapon, "tf_drop*"); )
+	//	{
+	//		weapon.SetModel("models/weapons/w_models/w_rapier_spy/w_rapier.mdl")
+	//	}
 	}
 }
+::CTFPlayer.SetAmmo <- function()
+{
+	printl(NetProps.GetPropIntArray( this, "localdata.m_iAmmo", 0) )
+	printl(NetProps.GetPropIntArray( this, "localdata.m_iAmmo", 1) )
+	printl(NetProps.GetPropIntArray( this, "localdata.m_iAmmo", 2) )
+	printl(NetProps.GetPropIntArray( this, "localdata.m_iAmmo", 3) )
+	printl(NetProps.GetPropIntArray( this, "localdata.m_iAmmo", 4) )
+	printl(NetProps.GetPropIntArray( this, "localdata.m_iAmmo", 5) )
+	printl(NetProps.GetPropIntArray( this, "localdata.m_iAmmo", 6) )
+	printl(NetProps.GetPropIntArray( this, "localdata.m_iAmmo", 7) )
+}
+function OnGameEvent_player_death(params)
+{
+	if ("userid" in params)
+	{
+		local player = GetPlayerFromUserID(params.userid)
+		player.GiveWeaponCleanup()
+	}
+}
+	__CollectEventCallbacks(this, "OnGameEvent_", "GameEventCallbacks", RegisterScriptGameEventListener)
 
 /*vScript "GIVE_TF_WEAPON" framework for Team Fortress 2, by Yaki
 Special thanks ficool2 for finding the netprops to make the first weapon giving function, AddWeapon().
@@ -80,10 +80,12 @@ TODO: ReturnWeaponSlot
 TODO: Find a way to add wearables like demoshield, booties, etc
 DONE: Grab active weapon and switch it. If slot exists, just switch to the new weapon
 TODO: Fix crit boosts' colors
+TODO: Giving class with passive items (Targe, Razorback, etc) need extra check when deleting secondaries because they're not in m_hMyWeapons
 
 Notes to Users
  - Set CVAR_GTFW_* for easy tweaking of script.
  - "m_bOnlyIterateItemViewAttributes" is used to mark if an item is custom. It's set to 1 via SetCustomWeapon.
+ - When using GiveWeapon, weapon strings for unlocks don't need "The " in them. (i.e. "The Sandvich" is invalid, but "Sandvich" is acceptable)
 
 Functions to put in Your OnGameEvents
 	CTFPlayer.GiveWeaponCleanup_post_inventory_application
@@ -192,13 +194,6 @@ const GLOBAL_WEAPON_COUNT = 10
 ::CVAR_GTFW_USE_VIEWMODEL_FIX <- true	//automatically fixes any and all viewmodel arms to match the class you're playing as.
 ::CVAR_GTFW_GIVEWEAPON_DROP_WEAPONS <- false		//drops your weapon in favor of the new one
 
-enum SolidFlags
-{
-	FSOLID_CUSTOMRAYTEST		= 1,
-	FSOLID_CUSTOMBOXTEST		= 2,
-	FSOLID_NOT_SOLID			= 4,
-	FSOLID_TRIGGER				= 8,
-}
 
 PrecacheModel("models/weapons/c_models/c_bigaxe/c_bigaxe.mdl")
 PrecacheModel("models/weapons/w_models/w_rapier_spy/w_rapier.mdl")
@@ -521,96 +516,15 @@ GTFW_MODEL_ARMS <-
 	"MISC",
 ]
 
-::SearchAllWeaponsArray <-
-[
-	1,	//"tf_weapon_bat"
-	1,	//"tf_weapon_bat_fish"
-	1,	//"tf_weapon_bat_giftwrap"
-	1,	//"tf_weapon_bat_wood"
-	5,	//"tf_weapon_bonesaw"
-	4,	//"tf_weapon_bottle"
-	7,	//"tf_weapon_breakable_sign"
-	3,	//"tf_weapon_buff_item"
-	0,	//"tf_weapon_builder"		// Uses 0 for multiclass
-	4,	//"tf_weapon_cannon"
-	2,	//"tf_weapon_charged_smg"
-	1,	//"tf_weapon_cleaver"
-	2,	//"tf_weapon_club"
-	2,	//"tf_weapon_compound_bow"
-	5,	//"tf_weapon_crossbow"
-	9,	//"tf_weapon_drg_pomson"
-	7,	//"tf_weapon_fireaxe"
-	6,	//"tf_weapon_fists"
-	7,	//"tf_weapon_flamethrower"
-	7,	//"tf_weapon_flaregun"
-	7,	//"tf_weapon_flaregun_revenge"
-	0,	//"tf_weapon_grapplinghook"		// Uses 0 for multiclass
-	4,	//"tf_weapon_grenadelauncher"
-	1,	//"tf_weapon_handgun_scout_primary"
-	1,	//"tf_weapon_handgun_scout_secondary"
-	8,	//"tf_weapon_invis"
-	2,	//"tf_weapon_jar"
-	1,	//"tf_weapon_jar_milk"
-	7,	//"tf_weapon_jar_gas"
-	3,	//"tf_weapon_katana"		// Uses 11 for Soldier/Demo
-	8,	//"tf_weapon_knife"
-	9,	//"tf_weapon_laser_pointer"
-	6,	//"tf_weapon_lunchbox"
-	1,	//"tf_weapon_lunchbox_drink"
-	9,	//"tf_weapon_mechanical_arm"
-	5,	//"tf_weapon_medigun"
-	6,	//"tf_weapon_minigun"
-	3,	//"tf_weapon_parachute"		// Uses 11 for Soldier/Demo
-	4,	//"tf_weapon_parachute_primary"
-	3,	//"tf_weapon_parachute_secondary"
-	3,	//"tf_weapon_particle_cannon"
-	0,	//"tf_weapon_passtime_gun"		// Uses 0 for multiclass
-	9,	//"tf_weapon_pda_engineer_build"
-	9,	//"tf_weapon_pda_engineer_Kill"
-	8,	//"tf_weapon_pda_spy"
-	1,	//"tf_weapon_pep_brawler_blaster"
-	4,	//"tf_weapon_pipebomblauncher"
-	9,	//"tf_weapon_pistol"
-	1,	//"tf_weapon_pistol_scout"
-	3,	//"tf_weapon_raygun"
-	8,	//"tf_weapon_revolver"
-	9,	//"tf_weapon_robot_arm"
-	3,	//"tf_weapon_rocketlauncher"
-	3,	//"tf_weapon_rocketlauncher_airstrike"
-	3,	//"tf_weapon_rocketlauncher_directhit"
-	7,	//"tf_weapon_rocketlauncher_fireball"
-	7,	//"tf_weapon_rocketpack"
-	8,	//"tf_weapon_sapper"
-	1,	//"tf_weapon_scattergun"
-	9,	//"tf_weapon_sentry_revenge"
-	6,	//"tf_weapon_shotgun_hwg"
-	9,	//"tf_weapon_shotgun_primary"
-	7,	//"tf_weapon_shotgun_pyro"
-	9,	//"tf_weapon_shotgun_building_rescue"
-	3,	//"tf_weapon_shotgun_soldier"
-	3,	//"tf_weapon_shovel"
-	7,	//"tf_weapon_slap"
-	2,	//"tf_weapon_smg"
-	2,	//"tf_weapon_sniperrifle"
-	2,	//"tf_weapon_sniperrifle_classic"
-	2,	//"tf_weapon_sniperrifle_decap"
-	1,	//"tf_weapon_soda_popper"
-	0,	//"tf_weapon_spellbook"		// Uses 0 for multiclass
-	4,	//"tf_weapon_stickbomb"
-	4,	//"tf_weapon_sword"
-	5,	//"tf_weapon_syringegun_medic"
-	9,	//"tf_weapon_wrench"
-]
-
 enum TF_AMMO
 {
-    NONE = 0
-    PRIMARY = 1
-    SECONDARY = 2
-    MELEE = 3
-    GRENADES1 = 4 // e.g. Sandman
-    GRENADES2 = 5 // e.g. Mad Milk
-    GRENADES3 = 6 // e.g. Spells
+	NONE = 0
+	PRIMARY = 1
+	SECONDARY = 2
+	METAL = 3
+	GRENADES1 = 4 // e.g. Sandman, Jarate, Sandvich
+	GRENADES2 = 5 // e.g. Mad Milk, Bonk,
+	GRENADES3 = 6 // e.g. Spells
 }
 
 class TF_WEAPONS
@@ -637,6 +551,10 @@ class TF_WEAPONS
 		{
 			className = "tf_wearable_demoshield"
 		}
+		else if ( weapon == "razorback" )
+		{
+			className = "tf_wearable_razorback"
+		}
 		else if ( weapon == "tf_wearable" )
 		{
 			className = weapon
@@ -659,9 +577,11 @@ TF_WEAPONS_ALL <- [
 	TF_WEAPONS(0, 6, "spellbook", 1070, null, "Basic Spellbook", "Spellbook Magazine", "spell_draw", TF_AMMO.GRENADES3, -1, -1, null)
 	TF_WEAPONS(0, 6, "spellbook", 1069, null, "Halloween Spellbook", "Fancy Spellbook", "spell_draw", TF_AMMO.GRENADES3, -1, -1, "models/player/items/all_class/hwn_spellbook_complete.mdl")
 	TF_WEAPONS(0, 3, "saxxy", 423, null, "Saxxy", null, "melee_allclass_draw", TF_AMMO.NONE, -1, -1, null)
+	TF_WEAPONS(0, 3, "saxxy", 264, null, "Frying Pan", "Pan", "melee_allclass_draw", TF_AMMO.NONE, -1, -1, null)
 	
 // Scout
 	TF_WEAPONS(1, 2, "pistol_scout", 23, 209, "Scout Pistol", null, "p_draw", TF_AMMO.SECONDARY, 12, 36, null)
+	TF_WEAPONS(1, 2, "lunchbox_drink", 46, null, "Bonk! Atomic Punch", "Bonk", "ed_draw", TF_AMMO.GRENADES2, 1, -1, null)
 	
 // Solly
 	TF_WEAPONS(3, 2, "buff_item", 129, null, "Buff Banner", null, "s_draw", TF_AMMO.NONE, -1, -1, "models/weapons/c_models/c_buffpack/c_buffpack.mdl")
@@ -685,27 +605,64 @@ TF_WEAPONS_ALL <- [
 	TF_WEAPONS(4, 3, "sword", 132, null, "Eyelander", null, "cm_draw", TF_AMMO.NONE, -1, -1, null)
 	TF_WEAPONS(4, 3, "sword", 327, null, "Claidheamh Mor", "Claid", "cm_draw", TF_AMMO.NONE, -1, -1, null)
 	TF_WEAPONS(0, 3, "sword", 404, null, "Persian Persuader", "Persuader", "melee_allclass_draw", TF_AMMO.NONE, -1, -1, null)
-
+	TF_WEAPONS(4, 3, "sword", 266, null, "Horseless Headless Horseman's Headtaker", "HHHH", "cm_draw", TF_AMMO.NONE, -1, -1, null)
+	TF_WEAPONS(4, 3, "sword", 482, null, "Nessie's Nine Iron", "Golf Club", "cm_draw", TF_AMMO.NONE, -1, -1, null)
+	
+	
 // Heavy
 	TF_WEAPONS(6, 1, "minigun", 15, 202, "Minigun", "Sasha", "m_draw", TF_AMMO.PRIMARY, 200, -1, null)
+	
 	TF_WEAPONS(6, 2, "shotgun_hwg", 11, 199, "Heavy Shotgun", null, "draw", TF_AMMO.SECONDARY, 6, 32, null)
 	TF_WEAPONS(6, 2, "lunchbox", 42, null, "Sandvich", null, "sw_draw", TF_AMMO.GRENADES1, 1, -1, null)
+	
 	TF_WEAPONS(6, 3, "fists", 5, 195, "Fists", null, "f_draw", TF_AMMO.NONE, -1, -1, null)
 	TF_WEAPONS(6, 3, "fists", 43, null, "Killing Gloves of Boxing", "KGB", "bg_draw", TF_AMMO.NONE, -1, -1, null)
 	
 // Engineer
 	TF_WEAPONS(9, 1, "shotgun_primary", 9, 199, "Shotgun Primary", "Engineer Shotgun", "fj_draw", TF_AMMO.PRIMARY, 6, 32, null)
+	
 	TF_WEAPONS(9, 2, "pistol", 22, 209, "Engineer Pistol", null, "pstl_draw", TF_AMMO.SECONDARY, 12, 200, null)
-	TF_WEAPONS(9, 3, "wrench", 7, 197, "Wrench", null, "spk_draw", TF_AMMO.NONE, -1, -1, null)
+	
+	TF_WEAPONS(9, 3, "wrench", 7, 197, "Wrench", null, "pdq_draw", TF_AMMO.NONE, -1, -1, null)
+	TF_WEAPONS(9, 3, "robot_arm", 142, null, "Gunslinger", null, "gun_draw", TF_AMMO.NONE, -1, -1, null)
+	TF_WEAPONS(9, 3, "wrench", 155, null, "Southern Hospitality", null, "spk_draw", TF_AMMO.NONE, -1, -1, null)
+	TF_WEAPONS(9, 3, "wrench", 329, null, "Jag", null, "pdq_draw", TF_AMMO.NONE, -1, -1, null)
+	TF_WEAPONS(9, 3, "wrench", 589, null, "Eureka Effect", null, "pdq_draw", TF_AMMO.NONE, -1, -1, null)
+	TF_WEAPONS(9, 3, "wrench", 169, null, "Golden Wrench", null, "pdq_draw", TF_AMMO.NONE, -1, -1, null)
+	
 	TF_WEAPONS(9, 4, "pda_engineer_build", 25, 737, "Build PDA", null, "bld_draw", TF_AMMO.NONE, -1, -1, null)
-	TF_WEAPONS(9, 5, "pda_engineer_Kill", 26, null, "Destruction PDA", "Kill PDA", "pda_draw", TF_AMMO.NONE, -1, -1, null)
+	TF_WEAPONS(9, 5, "pda_engineer_destroy", 26, null, "Destruction PDA", "Destroy PDA", "pda_draw", TF_AMMO.NONE, -1, -1, null)
 	TF_WEAPONS(9, 6, "builder", 28, null, "Engineer Toolbox", "Toolbox", "box_draw", TF_AMMO.NONE, -1, -1, null)
 	
 // Medic
+	TF_WEAPONS(5, 1, "syringegun_medic", 17, 204, "Syringe Gun", null, "sg_draw", TF_AMMO.PRIMARY, 40, 150, null)
+	TF_WEAPONS(5, 1, "syringegun_medic", 36, null, "Blutsauger", null, "sg_draw", TF_AMMO.PRIMARY, 40, 150, null)
+	TF_WEAPONS(5, 1, "crossbow", 305, null, "Crusader's Crossbow", null, "sg_draw", TF_AMMO.PRIMARY, 1, 38, null)
+	TF_WEAPONS(5, 1, "syringegun_medic", 412, null, "Overdose", null, "sg_draw", TF_AMMO.PRIMARY, 40, 150, null)
+	
+	TF_WEAPONS(5, 2, "medigun", 29, 211, "Medigun", null, "draw", TF_AMMO.NONE, -1, -1, null)
+	TF_WEAPONS(5, 2, "medigun", 35, null, "Kritzkrieg", null, "draw", TF_AMMO.NONE, -1, -1, null)
+	TF_WEAPONS(5, 2, "medigun", 441, null, "Quick-Fix", null, "draw", TF_AMMO.NONE, -1, -1, "models/weapons/c_models/c_proto_backpack/c_proto_backpack.mdl")
+	TF_WEAPONS(5, 2, "medigun", 998, null, "Vaccinator", null, "draw", TF_AMMO.NONE, -1, -1, "models/workshop/weapons/c_models/c_medigun_defense/c_medigun_defensepack.mdl")
+	
+	TF_WEAPONS(5, 3, "bonesaw", 8, 198, "Bonesaw", null, "bs_draw", TF_AMMO.NONE, -1, -1, null)
+	TF_WEAPONS(5, 3, "bonesaw", 37, null, "Ubersaw", null, "bs_draw", TF_AMMO.NONE, -1, -1, null)
+	TF_WEAPONS(5, 3, "bonesaw", 173, null, "Vita-Saw", null, "bs_draw", TF_AMMO.NONE, -1, -1, null)
+	TF_WEAPONS(5, 3, "bonesaw", 304, null, "Amputator", null, "bs_draw", TF_AMMO.NONE, -1, -1, null)
+	TF_WEAPONS(0, 3, "bonesaw", 413, null, "Solemn Vow", null, "melee_allclass_draw", TF_AMMO.NONE, -1, -1, null)
 
 // Sniper
+	TF_WEAPONS(2, 1, "sniperrifle", 14, 201, "Sniper Rifle", null, "draw", TF_AMMO.PRIMARY, 25, -1, null)
 	TF_WEAPONS(2, 1, "compound_bow", 56, null, "Huntsman", null, "bw_draw", TF_AMMO.PRIMARY, 1, 12, null)
+	TF_WEAPONS(2, 1, "sniperrifle", 230, null, "Sydney Sleeper", null, "draw", TF_AMMO.PRIMARY, 25, -1, null)
+	TF_WEAPONS(2, 1, "sniperrifle_decap", 402, null, "Bazaar Bargain", null, "draw", TF_AMMO.PRIMARY, 25, -1, null)
+	TF_WEAPONS(2, 1, "sniperrifle", 526, null, "Machina", null, "draw", TF_AMMO.PRIMARY, 25, -1, null)
+	TF_WEAPONS(2, 1, "sniperrifle", 752, null, "Hitman's Heatmaker", null, "draw", TF_AMMO.PRIMARY, 25, -1, null)
+	TF_WEAPONS(2, 1, "sniperrifle", 851, null, "AWPer Hand", "AWP", "draw", TF_AMMO.PRIMARY, 25, -1, null)
 	TF_WEAPONS(2, 1, "compound_bow", 1092, null, "Fortified Compound", null, "bw_draw", TF_AMMO.PRIMARY, 1, 12, null)
+	TF_WEAPONS(2, 1, "sniperrifle_classic", 1098, null, "Classic", null, "draw", TF_AMMO.PRIMARY, 25, -1, null)
+	
+	TF_WEAPONS(2, 2, "smg", 16, 203, "SMG", null, "smg_draw", TF_AMMO.SECONDARY, 25, 75, null)
 	
 // Spy
 	TF_WEAPONS(8, 1, "revolver", 24, 210, "Revolver", null, "draw", TF_AMMO.SECONDARY, 6, 24, null)
@@ -837,7 +794,7 @@ function GTFW_FindByClassname(baseitem) {
 		local entscriptname_weaponID = NetProps.GetPropInt(weapon, "m_AttributeManager.m_Item.m_iItemDefinitionIndex").tostring()
 		local entscriptname = "THINK_"+entscriptname_tfclass+"_"+entscriptname_weapon+"_ItemID"+entscriptname_weaponID+"_VMFix"
 		
-		const THINK_VMFIX_DELAY = 0.05
+		const THINK_VMFIX_DELAY = 0
 		
 		local entityscript = weapon.GetScriptScope()
 		entityscript[entscriptname] <- function()
@@ -846,12 +803,12 @@ function GTFW_FindByClassname(baseitem) {
 	//printl(NetProps.GetPropFloat(weapon, "LocalActiveWeaponData.m_flNextSecondaryAttack") )
 	//printl(NetProps.GetPropFloat(weapon, "LocalActiveWeaponData.m_flTimeWeaponIdle") )
 	//printl(NetProps.GetPropInt(weapon, "LocalActiveWeaponData.m_flAnimTime") )
-		/*	if ( player.InCond("TF_COND_TAUNTING") )
+			if ( player.InCond("TF_COND_TAUNTING") )
 			{
 				//weapon.DisableDraw()		//makes thirdperson weapon invisible. Commented out because weapon is parented to player again
 				WEAPON_ACTIVE = null
 			}
-		*/
+		
 			if ( player.GetActiveWeapon() != WEAPON_ACTIVE && !player.InCond("TF_COND_TAUNTING") )
 			{
 				if ( player.GetActiveWeapon() == weapon )
@@ -859,7 +816,6 @@ function GTFW_FindByClassname(baseitem) {
 					printl("WEAPON ACTIVE "+weapon)
 					printl( class_arms )
 					printl( draw_seq )
-					printl( NetProps.GetPropInt(weapon, "m_iState") )
 					WEAPON_ACTIVE = weapon
 					if (USING_VM_FIX)
 					{
@@ -887,36 +843,15 @@ function GTFW_FindByClassname(baseitem) {
 	NetProps.SetPropInt(weapon, "m_AttributeManager.m_Item.m_iEntityQuality", 0)
 	NetProps.SetPropInt(weapon, "m_AttributeManager.m_Item.m_iEntityLevel", 1)
 	NetProps.SetPropInt(weapon, "m_AttributeManager.m_Item.m_bInitialized", 1)
-	weapon.SetAbsOrigin(Vector(0,0,0))
-	weapon.SetAbsAngles(QAngle(0,0,0))
 	
-	Entities.DispatchSpawn(weapon)
-	
-	local solidFlags = NetProps.GetPropInt(weapon, "m_Collision.m_usSolidFlags");
-	NetProps.SetPropInt(weapon, "m_Collision.m_usSolidFlags", solidFlags | SolidFlags.FSOLID_NOT_SOLID);
-	
-	if ( classname != "tf_wearable_demoshield" || classname != "tf_wearable" )
-	{
-		NetProps.SetPropEntityArray(this, "m_hMyWeapons", weapon, slot)
-	}
+	NetProps.SetPropEntity(weapon, "m_hOwnerEntity", this)
+	NetProps.SetPropEntity(weapon, "m_hOwner", this)
 	NetProps.SetPropInt(weapon, "m_iTeamNum", this.GetTeam())
-	
-	solidFlags = NetProps.GetPropInt(weapon, "m_Collision.m_usSolidFlags");
-	NetProps.SetPropInt(weapon, "m_Collision.m_usSolidFlags", solidFlags & ~(SolidFlags.FSOLID_TRIGGER));
-	
-	DoEntFire("!self", "SetParent", "!activator", 0, this, weapon)
-	NetProps.SetPropInt(weapon, "m_MoveType", 0)
-	
-	weapon.SetLocalOrigin(this.GetLocalOrigin())
-	weapon.SetLocalAngles(this.GetAbsAngles())
 	
 	NetProps.SetPropInt(weapon, "m_bClientSideAnimation", 1)
 	NetProps.SetPropInt(weapon, "m_fEffects", 129)
-//	NetProps.SetPropInt(weapon, "m_iState", 2)
+	NetProps.SetPropInt(weapon, "m_iState", 2)
 	NetProps.SetPropInt(weapon, "m_CollisionGroup", 11)
-	
-	NetProps.SetPropEntity(weapon, "m_hOwnerEntity", this)
-	NetProps.SetPropEntity(weapon, "LocalActiveWeaponData.m_hOwner", this)
 	
 	local curTime = Time()
 	NetProps.SetPropFloat(weapon, "LocalActiveWeaponData.m_flNextPrimaryAttack", curTime)
@@ -925,6 +860,32 @@ function GTFW_FindByClassname(baseitem) {
 	
 	NetProps.SetPropInt(weapon, "m_bValidatedAttachedEntity", 1)
 	NetProps.SetPropInt(weapon, "m_AttributeManager.m_iReapplyProvisionParity", 3)
+	
+	weapon.SetAbsOrigin(Vector(0,0,0))
+	weapon.SetAbsAngles(QAngle(0,0,0))
+	
+	Entities.DispatchSpawn(weapon)
+	
+	local solidFlags = NetProps.GetPropInt(weapon, "m_Collision.m_usSolidFlags");
+	NetProps.SetPropInt(weapon, "m_Collision.m_usSolidFlags", solidFlags | Constants.SolidFlags.FSOLID_NOT_SOLID);
+	
+	solidFlags = NetProps.GetPropInt(weapon, "m_Collision.m_usSolidFlags");
+	NetProps.SetPropInt(weapon, "m_Collision.m_usSolidFlags", solidFlags & ~(Constants.SolidFlags.FSOLID_TRIGGER));
+	
+	if ( classname != "tf_wearable_demoshield" || classname != "tf_wearable" )
+	{
+		NetProps.SetPropEntityArray(this, "m_hMyWeapons", weapon, slot)
+	}
+	
+
+	weapon.SetLocalOrigin(this.GetLocalOrigin())
+	weapon.SetLocalAngles(this.GetAbsAngles())
+	DoEntFire("!self", "SetParent", "!activator", 0, this, weapon)
+	NetProps.SetPropInt(weapon, "m_MoveType", 0)
+
+	
+	
+	
 	
 //If added weapon is not owned by player's tfclass, mark it custom to fix VM arms
 	foreach (exists in TF_WEAPONS_ALL)
@@ -1006,6 +967,7 @@ function GTFW_FindByClassname(baseitem) {
 					local draw_seq = main_viewmodel.LookupSequence( wep.draw_seq )
 					
 					this.AddThinkToWeapon(weapon, main_viewmodel, class_arms, draw_seq)
+					
 					break
 				}
 			}
@@ -1337,6 +1299,7 @@ function GTFW_FindByClassname(baseitem) {
 	{
 		slot = "Misc"
 	}
+	Say(GetListenServerHost(), " ", false)
 	Say(GetListenServerHost(), "Active "+slot+" ["+ActiveWeapon.GetClassname()+"] (ItemID = "+ActiveWeapon_itemID+")", false)
 	
 	for (local i = 0; i < GLOBAL_WEAPON_COUNT; i++)
@@ -1364,6 +1327,20 @@ function GTFW_FindByClassname(baseitem) {
 			Say(GetListenServerHost(), slot+" ["+wep.GetClassname()+"] (ItemID = "+wep_itemID+")", false)
 		}
 	}
+	for (local weapon; weapon = Entities.FindByClassname(weapon, "tf_wea*"); )
+		{
+			printl("WEARABLE "+weapon+" "+weapon.GetMoveParent())
+			printl(weapon+" "+NetProps.GetPropInt(weapon, "m_AttributeManager.m_Item.m_iEntityQuality")) //typically -1
+			printl(weapon+" "+NetProps.GetPropInt(weapon, "m_AttributeManager.m_Item.m_bInitialized")) //1
+			printl(weapon+" "+NetProps.GetPropInt(weapon, "m_AttributeManager.m_Item.m_bOnlyIterateItemViewAttributes")) //0, or 1 for GiveWeapons
+			printl(weapon+" "+NetProps.GetPropInt(weapon, "m_AttributeManager.m_iReapplyProvisionParity")) //3 or 5
+			printl(weapon+" "+NetProps.GetPropInt(weapon, "m_AttributeManager.m_ProviderType")) //1
+			printl(weapon+" "+NetProps.GetPropEntity(weapon, "m_AttributeManager.m_hOuter")) //typically self
+			printl(weapon+" "+NetProps.GetPropInt(weapon, "m_bClientSideAnimation")) //1
+			printl(weapon+" "+NetProps.GetPropEntity(weapon, "m_hOwnerEntity")) //
+			printl(weapon+" "+NetProps.GetPropFloat(weapon, "m_hEffectEntity")) //
+			printl(weapon+" "+NetProps.GetPropInt(weapon, "m_bValidatedAttachedEntity") ) //0, or 1 for GiveWeapons
+		}
 }
 
 /* FUNCTION: disables being able to switch to a weapon.
@@ -1583,7 +1560,7 @@ change the baseitem's modelindex (which are class_arms) to the animations you wa
 	NetProps.SetPropInt(wearable_handle, "m_bValidatedAttachedEntity", 1)
 	NetProps.SetPropEntity(wearable_handle, "m_hOwnerEntity", this)
 	NetProps.SetPropInt(wearable_handle, "m_iTeamNum", this.GetTeam())
-	NetProps.SetPropInt(wearable_handle, "m_Collision.m_usSolidFlags", SolidFlags.FSOLID_NOT_SOLID)
+	NetProps.SetPropInt(wearable_handle, "m_Collision.m_usSolidFlags", Constants.SolidFlags.FSOLID_NOT_SOLID)
 	NetProps.SetPropInt(wearable_handle, "m_CollisionGroup", 11)
 	NetProps.SetPropInt(wearable_handle, "m_fEffects", 129)
 	
@@ -1706,7 +1683,11 @@ change the baseitem's modelindex (which are class_arms) to the animations you wa
 
 	if ( ( ExcludeWeapon == false && CUSTOM_WEAPON_ID == itemID ) || ( ExcludeWeapon == true && CUSTOM_WEAPON_ID != itemID ) )
 	{
-		NetProps.SetPropInt(CUSTOM_WEAPON, "m_AttributeManager.m_Item.m_bOnlyIterateItemViewAttributes", 1)
+		NetProps.SetPropInt(CUSTOM_WEAPON, "m_AttributeManager.m_Item.m_bOnlyIterateItemViewAttributes", 1)	//marks it as a custom weapon
+		printl(NetProps.GetPropInt(CUSTOM_WEAPON, "m_iWorldModelIndex"))
+		NetProps.SetPropInt(CUSTOM_WEAPON, "m_iWorldModelIndex", GetModelIndex(custom_weapon_model) )
+		printl("TEST2 "+NetProps.GetPropInt(CUSTOM_WEAPON, "m_iWorldModelIndex"))
+	//	NetProps.SetPropInt(CUSTOM_WEAPON, "LocalWeaponData.m_nViewModelIndex", 35)
 		this.UpdateArms(CUSTOM_WEAPON, custom_weapon_model, custom_arms_model, custom_draw_seq)
 	}
 	else
