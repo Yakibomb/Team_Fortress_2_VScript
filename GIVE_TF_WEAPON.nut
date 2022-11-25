@@ -1,25 +1,25 @@
 
 IncludeScript("GIVE_TF_WEAPON_ALL.nut")
-PrecacheModel("models/weapons/c_models/c_bigaxe/c_bigaxe.mdl")
+/*PrecacheModel("models/weapons/c_models/c_bigaxe/c_bigaxe.mdl")
 PrecacheModel("models/weapons/w_models/w_rapier_spy/w_rapier.mdl")
 PrecacheModel("models/weapons/w_models/w_scroll_engineer/w_scroll_build.mdl")
 PrecacheModel("models/weapons/w_models/w_scroll_engineer/w_scroll_destroy.mdl")
-PrecacheModel("models/weapons/c_models/c_medic_wood_dart_rifle/c_medic_wood_dart_rifle.mdl")
+PrecacheModel("models/weapons/c_models/c_medic_wood_dart_rifle/c_medic_wood_dart_rifle.mdl")*/
 PrecacheModel("models/weapons/c_models/c_engineer_gunslinger.mdl")
 enum GTFW_MODELS_CUSTOM_WEAPONS
 {
 	DEMO_BIGAXE		= "models/weapons/c_models/c_bigaxe/c_bigaxe.mdl",
-	SPY_RAPIER		= "models/weapons/w_models/w_rapier_spy/w_rapier.mdl",
+/*	SPY_RAPIER		= "models/weapons/w_models/w_rapier_spy/w_rapier.mdl",
 	ENGI_SCROLL_BUILD = "models/weapons/w_models/w_scroll_engineer/w_scroll_build.mdl",
 	ENGI_SCROLL_DESTROY = "models/weapons/w_models/w_scroll_engineer/w_scroll_destroy.mdl"
-	SCOUT_DARTGUN	= "models/weapons/c_models/c_medic_wood_dart_rifle/c_medic_wood_dart_rifle.mdl"
+	SCOUT_DARTGUN	= "models/weapons/c_models/c_medic_wood_dart_rifle/c_medic_wood_dart_rifle.mdl"*/
 }
 
 
-SendToConsole("con_filter_enable 1")
+/*SendToConsole("con_filter_enable 1")
 SendToConsole("con_filter_text_out Blocking")
 SendToConsole ("ent_fire tf_wearable* kill; clear;")
-SendToConsole ("ent_fire tf_weapon_sword kill")
+SendToConsole ("ent_fire tf_weapon_sword kill")*/
 printl("Executing...GTFW!")
 
 ::logPass <- 0
