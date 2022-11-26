@@ -1,3 +1,7 @@
+Please use GIVE_TF_WEAPON.nut instead, found here:
+https://github.com/Yakibomb/Team_Fortress_2_VScript/blob/main/GIVE_TF_WEAPON.nut
+https://github.com/Yakibomb/Team_Fortress_2_VScript/blob/main/GIVE_TF_WEAPON_ALL.nut
+
 /*vScript "giveweapon" framework, by Yaki
 Special thanks ficool2 (found netprops and made first weapon giving function, AddWeapon)
 Special thanks Super Zombie Fortress + SCP Secret Fortress for releasing source code (taught me what netprops were needed for custom viewmodels)
