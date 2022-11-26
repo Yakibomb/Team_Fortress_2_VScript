@@ -1,4 +1,4 @@
-Please use GIVE_TF_WEAPON.nut instead, found here:
+-> Please use GIVE_TF_WEAPON.nut instead, found here:
 https://github.com/Yakibomb/Team_Fortress_2_VScript/blob/main/GIVE_TF_WEAPON.nut
 https://github.com/Yakibomb/Team_Fortress_2_VScript/blob/main/GIVE_TF_WEAPON_ALL.nut
 
