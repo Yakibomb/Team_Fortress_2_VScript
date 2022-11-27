@@ -1,4 +1,4 @@
-IncludeScript("GIVE_TF_WEAPON_ALL.nut")
+IncludeScript("give_tf_weapon_all.nut")
 
 //vscript cvars. Adjust how you like, to customize the script easily.
 ::CVAR_GTFW_GIVEWEAPON_REPLACE_WEAPONS <- true	//if true, overwrites current weapon in slot. NOTE: Cannot use more than two weapons in a slot, unless using "hud_fastswitch 0".
@@ -138,100 +138,6 @@ Notes/Clarification
 
 End instructions */
 
-/* //Debug Stuff
-PrecacheModel("models/weapons/c_models/c_bigaxe/c_bigaxe.mdl")
-PrecacheModel("models/weapons/w_models/w_rapier_spy/w_rapier.mdl")
-PrecacheModel("models/weapons/w_models/w_scroll_engineer/w_scroll_build.mdl")
-PrecacheModel("models/weapons/w_models/w_scroll_engineer/w_scroll_destroy.mdl")
-PrecacheModel("models/weapons/c_models/c_medic_wood_dart_rifle/c_medic_wood_dart_rifle.mdl")
-enum GTFW_MODELS_CUSTOM_WEAPONS
-{
-	DEMO_BIGAXE		= "models/weapons/c_models/c_bigaxe/c_bigaxe.mdl",
-	SPY_RAPIER		= "models/weapons/w_models/w_rapier_spy/w_rapier.mdl",
-	ENGI_SCROLL_BUILD = "models/weapons/w_models/w_scroll_engineer/w_scroll_build.mdl",
-	ENGI_SCROLL_DESTROY = "models/weapons/w_models/w_scroll_engineear/w_scroll_destroy.mdl"
-	SCOUT_DARTGUN	= "models/weapons/c_models/c_medic_wood_dart_rifle/c_medic_wood_dart_rifle.mdl"
-}
-
-//::_<-delegate{_get=function(idx){return idx;}}:{};
-
-SendToConsole("con_filter_enable 1")
-SendToConsole("con_filter_text_out Blocking")
-SendToConsole ("ent_fire tf_wearable* kill; clear;")
-printl("Executing...GTFW!")
-
-::logPass <- 0
-function logpass(name)
-{
-	logPass++
-	printl("Pass #"+logPass+" ["+name+"]")
-}
-
-::ME <- GetListenServerHost()
-
-
-//"post_inventory_application" sent when a player gets a whole new set of items, aka touches a resupply locker / respawn cabinet or spawns in.
-function OnGameEvent_post_inventory_application(params)
-{
-	if ("userid" in params)
-	{
-		local player = GetPlayerFromUserID(params.userid)
-		player.GTFW_Cleanup()	//must be at the beginning!!
-		
-	//	local melee = player.ReturnWeapon(tf_weapon_fists)
-	//	melee.AddAttribute("disable weapon switch", 1, -1)
-			
-		if ( player.GetPlayerClass() == 1 )
-		{
-			local melee = player.GiveWeapon("Crossbow")
-			player.SetCustomWeapon(melee, GTFW_MODELS_CUSTOM_WEAPONS.SCOUT_DARTGUN, GTFW_ARMS.MEDIC)
-		}
-		if ( player.GetPlayerClass() == 9 )
-		{
-		//	local melee = player.ReturnWeapon(tf_weapon_wrench)
-		//	melee.AddAttribute("disable weapon switch", 1, -1)
-			//melee.AddAttribute("force weapon switch", 1, -1)
-		//	local melee = player.GiveWeapon("Eyelander")
-		//	player.SetCustomWeapon(melee, -1, GTFW_MODELS_CUSTOM_WEAPONS.DEMO_BIGAXE, GTFW_ARMS.DEMO )
-		//	player.SetCustomWeapon("Build PDA", GTFW_MODELS_CUSTOM_WEAPONS.ENGI_SCROLL_BUILD, null, null )
-		//	player.SetCustomWeapon("Destroy PDA", GTFW_MODELS_CUSTOM_WEAPONS.ENGI_SCROLL_DESTROY, null )
-		}
-	//	player.GiveWeapon("Festive Buff Banner")
-	//		player.GiveWeapon("Short Circuit")
-	//		player.GiveWeapon("Gunslinger")
-	//	local sword = player.GiveWeapon("Eyelander")
-	//	local SpySword = player.SetCustomWeapon(knife, -1, "models/weapons/w_models/w_rapier_spy/w_rapier.mdl", GTFW_ARMS.SPY, "knife_draw" )
-	//	NetProps.SetPropInt(player,"m_PlayerClass.m_iClass", 9)
-	
-	//	for (local weapon; weapon = Entities.FindByClassname(weapon, "tf_drop*"); )
-	//	{
-	//		weapon.SetModel("models/weapons/w_models/w_rapier_spy/w_rapier.mdl")
-	//	}
-	}
-}
-
-::CTFPlayer.SetAmmo <- function()
-{
-	printl(NetProps.GetPropIntArray( this, "localdata.m_iAmmo", 0) )
-	printl(NetProps.GetPropIntArray( this, "localdata.m_iAmmo", 1) )
-	printl(NetProps.GetPropIntArray( this, "localdata.m_iAmmo", 2) )
-	printl(NetProps.GetPropIntArray( this, "localdata.m_iAmmo", 3) )
-	printl(NetProps.GetPropIntArray( this, "localdata.m_iAmmo", 4) )
-	printl(NetProps.GetPropIntArray( this, "localdata.m_iAmmo", 5) )
-	printl(NetProps.GetPropIntArray( this, "localdata.m_iAmmo", 6) )
-	printl(NetProps.GetPropIntArray( this, "localdata.m_iAmmo", 7) )
-}
-function OnGameEvent_player_death(params)
-{
-	if ("userid" in params)
-	{
-		local player = GetPlayerFromUserID(params.userid)
-		player.GTFW_Cleanup()
-	}
-}
-	__CollectEventCallbacks(this, "OnGameEvent_", "GameEventCallbacks", RegisterScriptGameEventListener)
-
-// End debug stuff */
 ///-------------------------------------///
 
 
@@ -244,6 +150,8 @@ function OnGameEvent_player_death(params)
 
 const GLOBAL_WEAPON_COUNT = 10
 
+PrecacheModel("models/weapons/c_models/c_engineer_gunslinger.mdl")
+
 enum GTFW_ARMS
 {
 	SCOUT	=	"models/weapons/c_models/c_scout_arms.mdl",
@@ -255,6 +163,7 @@ enum GTFW_ARMS
 	PYRO	=	"models/weapons/c_models/c_pyro_arms.mdl",
 	SPY		=	"models/weapons/c_models/c_spy_arms.mdl",
 	ENGINEER=	"models/weapons/c_models/c_engineer_arms.mdl",
+	CIVILIAN=	"models/weapons/c_models/c_engineer_gunslinger.mdl",
 }
 
 ::GTFW_MODEL_ARMS <-
@@ -269,7 +178,7 @@ enum GTFW_ARMS
 	"models/weapons/c_models/c_pyro_arms.mdl",
 	"models/weapons/c_models/c_spy_arms.mdl",
 	"models/weapons/c_models/c_engineer_arms.mdl",
-	"models/weapons/c_models/c_engineer_gunslinger.mdl",	//Gunslinger/Civilian
+	"models/weapons/c_models/c_engineer_gunslinger.mdl",	//CIVILIAN/Gunslinger
 ]
 
 ::TF_GIVEWEAPON_CLASS <-
@@ -521,17 +430,6 @@ enum GTFW_ARMS
 	"Slot7",
 	"SLOT7",
 ]
-
-enum TF_AMMO
-{
-	NONE = 0
-	PRIMARY = 1
-	SECONDARY = 2
-	METAL = 3
-	GRENADES1 = 4 // e.g. Sandman, Jarate, Sandvich
-	GRENADES2 = 5 // e.g. Mad Milk, Bonk,
-	GRENADES3 = 6 // e.g. Spells
-}
 
 
 ::GTFW_FindEquipByStringOrID <- function(baseitem)
@@ -1026,6 +924,7 @@ enum TF_AMMO
 	{
 		main_viewmodel.FirstMoveChild().Kill()
 	}
+	main_viewmodel.SetModel( GTFW_MODEL_ARMS[this.GetPlayerClass()] )
 	for (local i = 0; i < 42; i++)
 	{
 		local wearable = Entities.FindByNameWithin(this, "tf_wearable_vscript", this.GetLocalOrigin(), 128)
@@ -1058,6 +957,14 @@ enum TF_AMMO
 
 ::CTFPlayer.GiveWeapon <- function(weapon)
 {
+	local main_viewmodel = NetProps.GetPropEntity(this, "m_hViewModel")
+	AddThinkToEnt(main_viewmodel, null)	//clears script if it was being used
+	if ( main_viewmodel != null && main_viewmodel.FirstMoveChild() != null )
+	{
+		main_viewmodel.FirstMoveChild().Kill()
+	}
+	main_viewmodel.SetModel( GTFW_MODEL_ARMS[this.GetPlayerClass()] )
+	
 	local YourNewGunSaxtonApproved = null
 	local DeletedWeapon = null
 
@@ -1825,3 +1732,100 @@ TODO: Add DeleteWeaponEx for searching all ents + ID value.
 TODO: Add custom weapon support.
 
 */
+/* //Debug Stuff
+PrecacheModel("models/weapons/c_models/c_bigaxe/c_bigaxe.mdl")
+PrecacheModel("models/weapons/w_models/w_rapier_spy/w_rapier.mdl")
+PrecacheModel("models/weapons/w_models/w_scroll_engineer/w_scroll_build.mdl")
+PrecacheModel("models/weapons/w_models/w_scroll_engineer/w_scroll_destroy.mdl")
+PrecacheModel("models/weapons/c_models/c_medic_wood_dart_rifle/c_medic_wood_dart_rifle.mdl")
+enum GTFW_MODELS_CUSTOM_WEAPONS
+{
+	DEMO_BIGAXE		= "models/weapons/c_models/c_bigaxe/c_bigaxe.mdl",
+	SPY_RAPIER		= "models/weapons/w_models/w_rapier_spy/w_rapier.mdl",
+	ENGI_SCROLL_BUILD = "models/weapons/w_models/w_scroll_engineer/w_scroll_build.mdl",
+	ENGI_SCROLL_DESTROY = "models/weapons/w_models/w_scroll_engineer/w_scroll_destroy.mdl"
+	SCOUT_DARTGUN	= "models/weapons/c_models/c_medic_wood_dart_rifle/c_medic_wood_dart_rifle.mdl"
+}
+
+//::_<-delegate{_get=function(idx){return idx;}}:{};
+
+/*SendToConsole("con_filter_enable 1")
+SendToConsole("con_filter_text_out Blocking")
+SendToConsole ("ent_fire tf_wearable* kill; clear;")
+printl("Executing...GTFW!")*/
+
+::logPass <- 0
+function logpass(name)
+{
+	logPass++
+	printl("Pass #"+logPass+" ["+name+"]")
+}
+
+::ME <- GetListenServerHost()
+
+/*
+//"post_inventory_application" sent when a player gets a whole new set of items, aka touches a resupply locker / respawn cabinet or spawns in.
+function OnGameEvent_post_inventory_application(params)
+{
+	if ("userid" in params)
+	{
+		local player = GetPlayerFromUserID(params.userid)
+		player.GTFW_Cleanup()	//must be at the beginning!!
+		
+	//	local melee = player.ReturnWeapon(tf_weapon_fists)
+	//	melee.AddAttribute("disable weapon switch", 1, -1)
+			
+		if ( player.GetPlayerClass() == 1 )
+		{
+			local melee = player.GiveWeapon("Crossbow")
+			player.SetCustomWeapon(melee, GTFW_MODELS_CUSTOM_WEAPONS.SCOUT_DARTGUN, GTFW_ARMS.MEDIC)
+		}
+		if ( player.GetPlayerClass() == 9 )
+		{
+		//	local melee = player.ReturnWeapon(tf_weapon_wrench)
+		//	melee.AddAttribute("disable weapon switch", 1, -1)
+			//melee.AddAttribute("force weapon switch", 1, -1)
+		//	local melee = player.GiveWeapon("Eyelander")
+		//	player.SetCustomWeapon(melee, -1, GTFW_MODELS_CUSTOM_WEAPONS.DEMO_BIGAXE, GTFW_ARMS.DEMO )
+		//	player.SetCustomWeapon("Build PDA", GTFW_MODELS_CUSTOM_WEAPONS.ENGI_SCROLL_BUILD, null, null )
+		//	player.SetCustomWeapon("Destroy PDA", GTFW_MODELS_CUSTOM_WEAPONS.ENGI_SCROLL_DESTROY, null )
+		}
+	//	player.GiveWeapon("Festive Buff Banner")
+	//		player.GiveWeapon("Short Circuit")
+	//		player.GiveWeapon("Gunslinger")
+	//	local sword = player.GiveWeapon("Eyelander")
+	//	local SpySword = player.SetCustomWeapon(knife, -1, "models/weapons/w_models/w_rapier_spy/w_rapier.mdl", GTFW_ARMS.SPY, "knife_draw" )
+	//	NetProps.SetPropInt(player,"m_PlayerClass.m_iClass", 9)
+	
+    player.GiveWeapon(45)
+    player.GiveWeapon(449)
+    player.GiveWeapon(221)
+	//	for (local weapon; weapon = Entities.FindByClassname(weapon, "tf_drop*"); )
+	//	{
+	//		weapon.SetModel("models/weapons/w_models/w_rapier_spy/w_rapier.mdl")
+	//	}
+	}
+}
+
+::CTFPlayer.SetAmmo <- function()
+{
+	printl(NetProps.GetPropIntArray( this, "localdata.m_iAmmo", 0) )
+	printl(NetProps.GetPropIntArray( this, "localdata.m_iAmmo", 1) )
+	printl(NetProps.GetPropIntArray( this, "localdata.m_iAmmo", 2) )
+	printl(NetProps.GetPropIntArray( this, "localdata.m_iAmmo", 3) )
+	printl(NetProps.GetPropIntArray( this, "localdata.m_iAmmo", 4) )
+	printl(NetProps.GetPropIntArray( this, "localdata.m_iAmmo", 5) )
+	printl(NetProps.GetPropIntArray( this, "localdata.m_iAmmo", 6) )
+	printl(NetProps.GetPropIntArray( this, "localdata.m_iAmmo", 7) )
+}
+function OnGameEvent_player_death(params)
+{
+	if ("userid" in params)
+	{
+		local player = GetPlayerFromUserID(params.userid)
+		player.GTFW_Cleanup()
+	}
+}
+	__CollectEventCallbacks(this, "OnGameEvent_", "GameEventCallbacks", RegisterScriptGameEventListener)
+
+// End debug stuff */
