@@ -1,4 +1,4 @@
-IncludeScript("GIVE_TF_WEAPON_ALL.nut") //all weapon properties. REQUIRED
+IncludeScript("GIVE_TF_WEAPON_ALL.nut")
 
 //vscript cvars. Adjust how you like, to customize the script easily.
 ::CVAR_GTFW_GIVEWEAPON_REPLACE_WEAPONS <- true	//if true, overwrites current weapon in slot. NOTE: Cannot use more than two weapons in a slot, unless using "hud_fastswitch 0".
@@ -149,10 +149,9 @@ enum GTFW_MODELS_CUSTOM_WEAPONS
 	DEMO_BIGAXE		= "models/weapons/c_models/c_bigaxe/c_bigaxe.mdl",
 	SPY_RAPIER		= "models/weapons/w_models/w_rapier_spy/w_rapier.mdl",
 	ENGI_SCROLL_BUILD = "models/weapons/w_models/w_scroll_engineer/w_scroll_build.mdl",
-	ENGI_SCROLL_DESTROY = "models/weapons/w_models/w_scroll_engineer/w_scroll_destroy.mdl"
+	ENGI_SCROLL_DESTROY = "models/weapons/w_models/w_scroll_engineear/w_scroll_destroy.mdl"
 	SCOUT_DARTGUN	= "models/weapons/c_models/c_medic_wood_dart_rifle/c_medic_wood_dart_rifle.mdl"
 }
-
 
 //::_<-delegate{_get=function(idx){return idx;}}:{};
 
@@ -167,20 +166,8 @@ function logpass(name)
 	logPass++
 	printl("Pass #"+logPass+" ["+name+"]")
 }
+
 ::ME <- GetListenServerHost()
-
-
-::PlayerLoadoutGlobal_DrawSeq <- {}
-::PlayerLoadoutGlobal_ClassArms <- {}
-::PlayerLoadoutGlobal_BonemergedArms <- {}
-::PlayerLoadoutGlobal_CustomWeaponModels_VM <- {}
-::PlayerLoadoutGlobal_CustomWeaponModels_TP <- {}
-
-PlayerLoadoutGlobal_DrawSeq.clear()
-PlayerLoadoutGlobal_ClassArms.clear()
-PlayerLoadoutGlobal_BonemergedArms.clear()
-PlayerLoadoutGlobal_CustomWeaponModels_VM.clear()
-PlayerLoadoutGlobal_CustomWeaponModels_TP.clear()
 
 
 //"post_inventory_application" sent when a player gets a whole new set of items, aka touches a resupply locker / respawn cabinet or spawns in.
@@ -244,8 +231,17 @@ function OnGameEvent_player_death(params)
 }
 	__CollectEventCallbacks(this, "OnGameEvent_", "GameEventCallbacks", RegisterScriptGameEventListener)
 
-//*/
+// End debug stuff */
 ///-------------------------------------///
+
+
+::PlayerLoadoutGlobal_DrawSeq <- {}
+::PlayerLoadoutGlobal_ClassArms <- {}
+::PlayerLoadoutGlobal_BonemergedArms <- {}
+::PlayerLoadoutGlobal_CustomWeaponModels_VM <- {}
+::PlayerLoadoutGlobal_CustomWeaponModels_TP <- {}
+
+
 const GLOBAL_WEAPON_COUNT = 10
 
 enum GTFW_ARMS
