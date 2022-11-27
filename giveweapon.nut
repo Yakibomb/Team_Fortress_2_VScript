@@ -1,6 +1,7 @@
--> Please use GIVE_TF_WEAPON.nut instead, found here:
-https://github.com/Yakibomb/Team_Fortress_2_VScript/blob/main/GIVE_TF_WEAPON.nut
-https://github.com/Yakibomb/Team_Fortress_2_VScript/blob/main/GIVE_TF_WEAPON_ALL.nut
+-> OBSOLETE!
+	Please use GIVE_TF_WEAPON.nut instead, found here:
+	https://github.com/Yakibomb/Team_Fortress_2_VScript/blob/main/give_tf_weapon.nut
+	https://github.com/Yakibomb/Team_Fortress_2_VScript/blob/main/give_tf_weapon_all.nut
 
 /*vScript "giveweapon" framework, by Yaki
 Special thanks ficool2 (found netprops and made first weapon giving function, AddWeapon)
