@@ -1,4 +1,15 @@
 
+enum TF_AMMO
+{
+	NONE = 0
+	PRIMARY = 1
+	SECONDARY = 2
+	METAL = 3
+	GRENADES1 = 4 // e.g. Sandman, Jarate, Sandvich
+	GRENADES2 = 5 // e.g. Mad Milk, Bonk,
+	GRENADES3 = 6 // e.g. Spells
+}
+
 ::GTFW_Saxxy <-
 [
 	"tf_weapon_fireaxe",	//MULTI-CLASS
@@ -166,9 +177,8 @@ class TF_WEP_FEST
 	}
 }
 
-TF_WEAPONS_ALL <- [
+::TF_WEAPONS_ALL <- [
 // Named shotgun is 199, for every class that has one
-// No festives on the list yet
 // Reserve shooter is multiclass (Soldier/Pyro)
 // Panic attack is multi
 // Missing grappling hook/Mannpower things
@@ -431,7 +441,7 @@ TF_WEAPONS_ALL <- [
 	TF_WEAPONS(8, 5, "invis", 297, null, "Enthusiast's Timepiece", "Timepiece", "offhand_draw", TF_AMMO.NONE, -1, -1, null)
 	TF_WEAPONS(8, 5, "invis", 947, null, "Quackenbirdt", null, "offhand_draw", TF_AMMO.NONE, -1, -1, null)
 ]
-TF_WEAPONS_ALL_WARPAINTSnBOTKILLERS <- [
+::TF_WEAPONS_ALL_WARPAINTSnBOTKILLERS <- [
 //Botkillers listed first, then warpaints
 	TF_WEAPONS_RESKIN(0, 2, "shotgun", 15003, 15016, 15044, 15047, 15085, 15109, 15132, 15133, 15152, null, null, null, null, "draw", TF_AMMO.SECONDARY, 6, 32)
 	TF_WEAPONS_RESKIN(1, 2, "pistol", 15013, 15018, 15035, 15041, 15046, 15056, 15060, 15061, 15100, 15101, 15102, 15126, 15148, "p_draw", TF_AMMO.SECONDARY, 12, 36)
@@ -468,7 +478,7 @@ TF_WEAPONS_ALL_WARPAINTSnBOTKILLERS <- [
 	
 ]
 
-TF_WEAPONS_ALL_FESTIVE <- [
+::TF_WEAPONS_ALL_FESTIVE <- [
 
 	//shotgun 1141
 	//pistol? 
