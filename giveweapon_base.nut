@@ -1,5 +1,5 @@
 // FUNCTION: All weapon properties. List gathered by ficool2.
-
+ 
 ::CTFPlayer.AddWeapon <- function(classname, itemindex, slot)
 {
 	local weapon = Entities.CreateByClassname(classname)
