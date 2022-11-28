@@ -66,6 +66,10 @@ PRIVATE OPERATIONS
 	GTFW_FindEquipByClassname(classname)
 		Finds an item by classname
 	GTFW_FindEquipByStringOrID(string_or_id)
+		Same as above function, except with string or item ID
+	GTFW_FindEquipBySlot(slot)
+		Finds equip if it has parameters like "primary", "secondary", etc
+		Returns true if it found anything, false if not
 
 Examples of Uses
 	CheckItems()
@@ -90,14 +94,16 @@ Examples of Uses
 		USE: handle.DeleteWeapon(15)
 			Deletes just the stock minigun with this ID
 	CTFPlayer.DisableWeapon(weapon_classname_or_id_or_string)
-		USE: CTFPlayer.DisableWeapon("Vaccinator")
+		USE: handle.DisableWeapon("Vaccinator")
 			Disable only Vaccinator
-		USE: CTFPlayer.DisableWeapon("secondary")
+		USE: handle.DisableWeapon("secondary")
 			Disable any secondary
-		USE: CTFPlayer.DisableWeapon("tf_weapon_bottle")
+		USE: handle.DisableWeapon("tf_weapon_bottle")
 			Disables any tf_weapon_bottle entity
+		USE: handle.DisableWeapon(7)
+			Disables only the stock Wrench (item ID#7)
 	CTFPlayer.SetCustomWeapon(baseitem, custom_weapon_model, custom_arms_model)
-		USE: handle.SetCustomWeapon("Knife", GTFW_MODELS_CUSTOM_WEAPONS.DEMO_BIGAXE, "models/weapons/c_models/c_scout_arms.mdl")
+		USE: handle.SetCustomWeapon("Knife", "models/weapons/c_models/c_bigaxe/c_bigaxe.mdl", "models/weapons/c_models/c_scout_arms.mdl")
 			Replaces stock knife with the Horseman's REAL Headtaker, using Scout's bat animations.
 		USE: handle.SetCustomWeapon("primary", models/workshop/weapons/c_models/c_demo_cannon/c_demo_cannon.mdl, null)
 			replaces all primaries with "c_demo_cannon.mdl"
@@ -569,7 +575,7 @@ enum GTFW_ARMS
 				{
 					weapon.SetModelSimple( GTFW_MODEL_ARMS[10] )	//Gunslinger arms
 				}
-				else { weapon.SetModel( GTFW_MODEL_ARMS[this.GetPlayerClass()] ) }
+				else { weapon.SetModelSimple( GTFW_MODEL_ARMS[this.GetPlayerClass()] ) }
 				return weapon
 			}
 		}
@@ -613,7 +619,7 @@ enum GTFW_ARMS
 			}
 			if ( arms_model != null && draw_anim != null)
 			{
-				main_viewmodel.SetModel( arms_model )
+				main_viewmodel.SetModelSimple( arms_model )
 				class_arms = arms_model
 				draw_seq = main_viewmodel.LookupSequence( draw_anim )
 			}
@@ -621,7 +627,7 @@ enum GTFW_ARMS
 		// setting this all the time breaks deploy animations
 			else
 			{
-				main_viewmodel.SetModel( class_arms )
+				main_viewmodel.SetModelSimple( class_arms )
 				draw_seq = main_viewmodel.LookupSequence( draw_seq )
 			}
 			if ( weapon_model != null && weapon_model != 0 )
@@ -724,7 +730,7 @@ enum GTFW_ARMS
 				}
 				else {
 					PlayerLoadoutGlobal_ClassArms[this][wep.GetClassname()] <- GTFW_MODEL_ARMS[baseitem.tf_class]
-					wep.SetModel( GTFW_MODEL_ARMS[baseitem.tf_class] )
+					wep.SetModelSimple( GTFW_MODEL_ARMS[baseitem.tf_class] )
 				}
 			}
 		}
@@ -767,7 +773,7 @@ enum GTFW_ARMS
 				
 			// This updates the viewmodel.
 			// Remember, the weapon's sequences are decided by tf_viewmodel (or this handle, main_viewmodel)
-				main_viewmodel.SetModel( PlayerLoadoutGlobal_ClassArms[player][wep.GetClassname()] )
+				main_viewmodel.SetModelSimple( PlayerLoadoutGlobal_ClassArms[player][wep.GetClassname()] )
 				main_viewmodel.SetSequence( main_viewmodel.LookupSequence( PlayerLoadoutGlobal_DrawSeq[player][wep.GetClassname()] ) )
 				
 			// These are vars are for the next part
@@ -924,7 +930,7 @@ enum GTFW_ARMS
 	{
 		main_viewmodel.FirstMoveChild().Kill()
 	}
-	main_viewmodel.SetModel( GTFW_MODEL_ARMS[this.GetPlayerClass()] )
+	main_viewmodel.SetModelSimple( GTFW_MODEL_ARMS[this.GetPlayerClass()] )
 	for (local i = 0; i < 42; i++)
 	{
 		local wearable = Entities.FindByNameWithin(this, "tf_wearable_vscript", this.GetLocalOrigin(), 128)
@@ -963,7 +969,7 @@ enum GTFW_ARMS
 	{
 		main_viewmodel.FirstMoveChild().Kill()
 	}
-	main_viewmodel.SetModel( GTFW_MODEL_ARMS[this.GetPlayerClass()] )
+	main_viewmodel.SetModelSimple( GTFW_MODEL_ARMS[this.GetPlayerClass()] )
 	
 	local YourNewGunSaxtonApproved = null
 	local DeletedWeapon = null
@@ -974,6 +980,9 @@ enum GTFW_ARMS
 	local NewWeapon = baseitem.className
 	local ItemID = baseitem.itemID
 	local Slot = baseitem.slot
+	local AmmoType = baseitem.ammoType
+	local AmmoReserve = baseitem.reserve
+	local Extra_Wearable = baseitem.wearable
 	
 /*marks weapon as unintended for class
 	if ( baseitem.tf_class != this.GetPlayerClass() )
@@ -1058,6 +1067,15 @@ enum GTFW_ARMS
 		}
 	}
 	
+	if ( NewWeapon == "tf_weapon_revolver" && this.GetPlayerClass != 8 ) //Forcefully changes ammo type to primary if not Spy
+	{
+		NetProps.SetPropInt( YourNewGunSaxtonApproved, "LocalWeaponData.m_iPrimaryAmmoType", TF_AMMO.PRIMARY)
+	}
+	
+	//YourNewGunSaxtonApproved.AddAttribute("maxammo primary reduced", 0.1, -1)
+	//NetProps.SetPropIntArray(this, "localdata.m_iAmmo", AmmoReserve, AmmoType)
+	//this.GetAmmo()
+	
 	return YourNewGunSaxtonApproved
 }
 
@@ -1105,7 +1123,7 @@ enum GTFW_ARMS
 			
 			if ( wep != null )
 			{
-				if ( FindEquipBySlot(wep) )
+				if ( GTFW_FindEquipBySlot(wep) )
 				{
 					DeleteThis = wep.GetClassname()
 				}
@@ -1194,7 +1212,7 @@ enum GTFW_ARMS
 			
 			if ( wep != null )
 			{
-				if ( FindEquipBySlot(wep) )
+				if ( GTFW_FindEquipBySlot(wep) )
 				{
 					ReplaceThis = wep.GetClassname()
 				}
@@ -1293,7 +1311,7 @@ enum GTFW_ARMS
 	returns true if it found anything
 
 */
-function FindEquipBySlot(weapon)
+function GTFW_FindEquipBySlot(weapon)
 {
 	if ( weapon == "primary" || weapon == "PRIMARY" || weapon == "Primary" )
 	{
@@ -1401,7 +1419,7 @@ function FindEquipBySlot(weapon)
 			
 			if ( wep != null )
 			{
-				if ( FindEquipBySlot(wep) )
+				if ( GTFW_FindEquipBySlot(wep) )
 				{
 					DisableThis = wep.GetClassname()
 				}
@@ -1475,7 +1493,7 @@ function FindEquipBySlot(weapon)
 			
 			if ( wep != null )
 			{
-				if ( FindEquipBySlot(wep) )
+				if ( GTFW_FindEquipBySlot(wep) )
 				{
 					GetThis = wep.GetClassname()
 				}
@@ -1522,7 +1540,7 @@ Can set Sequence of weapon via main_viewmodel. Example for Scout's Bat:
 main_viewmodel.SetSequence(main_viewmodel.LookupSequence("b_draw") )
 
 You can change which sequence list by changing the model itself to a different class arms model.
-change the main_viewmodel using main_viewmodel.SetModel() to change to new set of class arms
+change the main_viewmodel using main_viewmodel.SetModelSimple() to change to new set of class arms
 change the baseitem's modelindex (which are class_arms) to the animations you want to use for the new weapon
 */
 
@@ -1653,7 +1671,7 @@ change the baseitem's modelindex (which are class_arms) to the animations you wa
 		{
 			local wep = NetProps.GetPropEntityArray(this, "m_hMyWeapons", i)
 		
-			if ( wep != null && FindEquipBySlot(wep) )
+			if ( wep != null && GTFW_FindEquipBySlot(wep) )
 			{
 				CUSTOM_WEAPON = wep
 				break
@@ -1686,6 +1704,7 @@ change the baseitem's modelindex (which are class_arms) to the animations you wa
 				
 		NetProps.SetPropInt(CUSTOM_WEAPON, "m_AttributeManager.m_Item.m_bOnlyIterateItemViewAttributes", 1)	//marks our weapon as custom
 		this.UpdateArms(CUSTOM_WEAPON, custom_weapon_model, custom_arms_model, draw_seq)
+		this.AddThinkToViewModel()
 	}
 	else
 	{
@@ -1732,7 +1751,9 @@ TODO: Add DeleteWeaponEx for searching all ents + ID value.
 TODO: Add custom weapon support.
 
 */
-/* //Debug Stuff
+
+/*
+ //Debug Stuff
 PrecacheModel("models/weapons/c_models/c_bigaxe/c_bigaxe.mdl")
 PrecacheModel("models/weapons/w_models/w_rapier_spy/w_rapier.mdl")
 PrecacheModel("models/weapons/w_models/w_scroll_engineer/w_scroll_build.mdl")
@@ -1749,10 +1770,10 @@ enum GTFW_MODELS_CUSTOM_WEAPONS
 
 //::_<-delegate{_get=function(idx){return idx;}}:{};
 
-/*SendToConsole("con_filter_enable 1")
+SendToConsole("con_filter_enable 1")
 SendToConsole("con_filter_text_out Blocking")
 SendToConsole ("ent_fire tf_wearable* kill; clear;")
-printl("Executing...GTFW!")*/
+printl("Executing...GTFW!")
 
 ::logPass <- 0
 function logpass(name)
@@ -1763,7 +1784,7 @@ function logpass(name)
 
 ::ME <- GetListenServerHost()
 
-/*
+
 //"post_inventory_application" sent when a player gets a whole new set of items, aka touches a resupply locker / respawn cabinet or spawns in.
 function OnGameEvent_post_inventory_application(params)
 {
@@ -1777,8 +1798,9 @@ function OnGameEvent_post_inventory_application(params)
 			
 		if ( player.GetPlayerClass() == 1 )
 		{
-			local melee = player.GiveWeapon("Crossbow")
-			player.SetCustomWeapon(melee, GTFW_MODELS_CUSTOM_WEAPONS.SCOUT_DARTGUN, GTFW_ARMS.MEDIC)
+			player.GiveWeapon("Revolver")
+		//	local melee = player.GiveWeapon("Crossbow")
+		//	player.SetCustomWeapon(melee, GTFW_MODELS_CUSTOM_WEAPONS.SCOUT_DARTGUN, GTFW_ARMS.MEDIC)
 		}
 		if ( player.GetPlayerClass() == 9 )
 		{
@@ -1787,8 +1809,8 @@ function OnGameEvent_post_inventory_application(params)
 			//melee.AddAttribute("force weapon switch", 1, -1)
 		//	local melee = player.GiveWeapon("Eyelander")
 		//	player.SetCustomWeapon(melee, -1, GTFW_MODELS_CUSTOM_WEAPONS.DEMO_BIGAXE, GTFW_ARMS.DEMO )
-		//	player.SetCustomWeapon("Build PDA", GTFW_MODELS_CUSTOM_WEAPONS.ENGI_SCROLL_BUILD, null, null )
-		//	player.SetCustomWeapon("Destroy PDA", GTFW_MODELS_CUSTOM_WEAPONS.ENGI_SCROLL_DESTROY, null )
+			player.SetCustomWeapon("Build PDA", "models/weapons/w_models/w_scroll_engineer/w_scroll_build.mdl", null )
+			player.SetCustomWeapon("Destroy PDA", "models/weapons/w_models/w_scroll_engineer/w_scroll_destroy.mdl", null )
 		}
 	//	player.GiveWeapon("Festive Buff Banner")
 	//		player.GiveWeapon("Short Circuit")
@@ -1796,19 +1818,27 @@ function OnGameEvent_post_inventory_application(params)
 	//	local sword = player.GiveWeapon("Eyelander")
 	//	local SpySword = player.SetCustomWeapon(knife, -1, "models/weapons/w_models/w_rapier_spy/w_rapier.mdl", GTFW_ARMS.SPY, "knife_draw" )
 	//	NetProps.SetPropInt(player,"m_PlayerClass.m_iClass", 9)
-	
-    player.GiveWeapon(45)
-    player.GiveWeapon(449)
-    player.GiveWeapon(221)
+		
+	//	player.GiveWeapon(45)
+	//	player.GiveWeapon(449)
+	//	player.GiveWeapon(221)
 	//	for (local weapon; weapon = Entities.FindByClassname(weapon, "tf_drop*"); )
 	//	{
-	//		weapon.SetModel("models/weapons/w_models/w_rapier_spy/w_rapier.mdl")
+	//		weapon.SetModelSimple("models/weapons/w_models/w_rapier_spy/w_rapier.mdl")
 	//	}
 	}
 }
+	__CollectEventCallbacks(this, "OnGameEvent_", "GameEventCallbacks", RegisterScriptGameEventListener)
 
-::CTFPlayer.SetAmmo <- function()
+::CTFPlayer.GetAmmo <- function()
 {
+	local active = this.GetActiveWeapon()
+	printl(NetProps.GetPropInt( active, "LocalWeaponData.m_iClip1") )
+	printl(NetProps.GetPropInt( active, "LocalWeaponData.m_iClip2") )
+	printl(NetProps.GetPropInt( active, "LocalWeaponData.m_iPrimaryAmmoType") )
+	printl(NetProps.GetPropInt( active, "LocalWeaponData.m_iSecondaryAmmoType") )
+	
+	printl("LINE")
 	printl(NetProps.GetPropIntArray( this, "localdata.m_iAmmo", 0) )
 	printl(NetProps.GetPropIntArray( this, "localdata.m_iAmmo", 1) )
 	printl(NetProps.GetPropIntArray( this, "localdata.m_iAmmo", 2) )
@@ -1817,6 +1847,7 @@ function OnGameEvent_post_inventory_application(params)
 	printl(NetProps.GetPropIntArray( this, "localdata.m_iAmmo", 5) )
 	printl(NetProps.GetPropIntArray( this, "localdata.m_iAmmo", 6) )
 	printl(NetProps.GetPropIntArray( this, "localdata.m_iAmmo", 7) )
+	
 }
 function OnGameEvent_player_death(params)
 {
