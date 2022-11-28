@@ -1,3 +1,31 @@
+//NOTE: These events need to be in your game for this to work properly.
+// However, there can only be one event listener stored total. Paste the the part in the "CTFPlayer.GTFW_Cleanup()" part in the beginning of each event.
+
+//"player_death" event is sent when a player dies.
+function OnGameEvent_player_death(params)
+{
+	if ("userid" in params)
+	{
+		local player = GetPlayerFromUserID(params.userid)
+		player.GTFW_Cleanup() //<-Add this to your own player_death event. It must be at the beginning!
+	}
+}
+	__CollectEventCallbacks(this, "OnGameEvent_", "GameEventCallbacks", RegisterScriptGameEventListener)
+	
+//"post_inventory_application" event is sent when a player gets a whole new set of items, aka touches a resupply locker / respawn cabinet or spawns in.
+function OnGameEvent_post_inventory_application(params)
+{
+	if ("userid" in params)
+	{
+		local player = GetPlayerFromUserID(params.userid)
+		player.GTFW_Cleanup()	//<-Add this to your own player_death event. It must be at the beginning!
+	}
+}
+	__CollectEventCallbacks(this, "OnGameEvent_", "GameEventCallbacks", RegisterScriptGameEventListener)
+
+// The prior should be deleted if using those events. Just add the part I tell you to, ok? //
+// Include the rest of this script! //
+
 IncludeScript("give_tf_weapon_all.nut")
 
 //vscript cvars. Adjust how you like, to customize the script easily.
