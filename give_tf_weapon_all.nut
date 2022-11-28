@@ -411,12 +411,12 @@ class TF_WEP_FEST
 	TF_WEAPONS(2, 3, "club", 401, null, "Shahanshah", null, "m_draw", TF_AMMO.NONE, -1, -1, null)
 		
 // Spy
-	TF_WEAPONS(8, 1, "revolver", 24, 210, "Revolver", null, "draw", TF_AMMO.SECONDARY, 6, 24, null)
-	TF_WEAPONS(8, 1, "revolver", 61, null, "Ambassador", null, "draw", TF_AMMO.SECONDARY, 6, 24, null)
-	TF_WEAPONS(8, 1, "revolver", 161, null, "Big Kill", null, "draw", TF_AMMO.SECONDARY, 6, 24, null)
-	TF_WEAPONS(8, 1, "revolver", 224, null, "L'Etranger", null, "draw", TF_AMMO.SECONDARY, 6, 24, null)
-	TF_WEAPONS(8, 1, "revolver", 460, null, "Enforcer", null, "draw", TF_AMMO.SECONDARY, 6, 24, null)
-	TF_WEAPONS(8, 1, "revolver", 525, null, "Diamondback", null, "draw", TF_AMMO.SECONDARY, 6, 24, null)
+	TF_WEAPONS(8, 1, "revolver", 24, 210, "Revolver", null, "draw", TF_AMMO.PRIMARY, 6, 24, null)
+	TF_WEAPONS(8, 1, "revolver", 61, null, "Ambassador", null, "draw", TF_AMMO.PRIMARY, 6, 24, null)
+	TF_WEAPONS(8, 1, "revolver", 161, null, "Big Kill", null, "draw", TF_AMMO.PRIMARY, 6, 24, null)
+	TF_WEAPONS(8, 1, "revolver", 224, null, "L'Etranger", null, "draw", TF_AMMO.PRIMARY, 6, 24, null)
+	TF_WEAPONS(8, 1, "revolver", 460, null, "Enforcer", null, "draw", TF_AMMO.PRIMARY, 6, 24, null)
+	TF_WEAPONS(8, 1, "revolver", 525, null, "Diamondback", null, "draw", TF_AMMO.PRIMARY, 6, 24, null)
 	
 	//testing to see what slot2 does; need to test if it reacts well on Engineer (who already has a tf_weapon_builder)
 	TF_WEAPONS(8, 2, "builder", 735, 736, "builder_spy", "Sapper", "c_sapper_draw", TF_AMMO.NONE, -1, -1, null)
@@ -472,7 +472,7 @@ class TF_WEP_FEST
 	TF_WEAPONS_RESKIN(2, 1, "sniperrifle", 15000, 15007, 15019, 15023, 15033, 15059, 15070, 15071, 15072, 15111, 15112, 15135, 15136, "draw", TF_AMMO.PRIMARY, 25, -1)
 	TF_WEAPONS_RESKIN(2, 2, "smg", 15001, 15022, 15032, 15037, 15058, 15076, 15110, 15134, 15153, null, null, null, null, "smg_draw", TF_AMMO.SECONDARY, 25, 75)
 	
-	TF_WEAPONS_RESKIN(8, 1, "revolver", 15011, 15027, 15042, 15051, 15062, 15063, 15064, 15103, 15127, 15128, 15149, null, null, "draw", TF_AMMO.SECONDARY, 6, 24)
+	TF_WEAPONS_RESKIN(8, 1, "revolver", 15011, 15027, 15042, 15051, 15062, 15063, 15064, 15103, 15127, 15128, 15149, null, null, "draw", TF_AMMO.PRIMARY, 6, 24)
 	TF_WEAPONS_RESKIN(8, 3, "knife", 794, 803, 883, 892, 901, 910, 959, 968, null, null, null, null, null, "knife_draw", TF_AMMO.NONE, -1, -1)
 	TF_WEAPONS_RESKIN(8, 3, "knife", 15062, 15094, 15095, 15096, 15118, 15119, 15143, 15144, null, null, null, null, null, "knife_draw", TF_AMMO.NONE, -1, -1)
 	
@@ -520,8 +520,8 @@ class TF_WEP_FEST
 	TF_WEP_FEST(2, 2, "smg", 1083, "Festive SMG", null, "smg_draw", TF_AMMO.SECONDARY, 25, 75, null)
 	TF_WEP_FEST(2, 2, "jar", 1149, "Festive Jarate", null, "pj_draw", TF_AMMO.GRENADES1, 1, -1, null)
 	
-	TF_WEP_FEST(8, 1, "revolver", 1142, "Festive Revolver", null, "draw", TF_AMMO.SECONDARY, 6, 24, null)
-	TF_WEP_FEST(8, 1, "revolver", 1006, "Festive Ambassador", null, "draw", TF_AMMO.SECONDARY, 6, 24, null)
+	TF_WEP_FEST(8, 1, "revolver", 1142, "Festive Revolver", null, "draw", TF_AMMO.PRIMARY, 6, 24, null)
+	TF_WEP_FEST(8, 1, "revolver", 1006, "Festive Ambassador", null, "draw", TF_AMMO.PRIMARY, 6, 24, null)
 	TF_WEP_FEST(8, 2, "builder", 1080, "Festive Sapper", null, "c_sapper_draw", TF_AMMO.NONE, -1, -1, null) //testing to see what slot2 does; need to test if it reacts well on Engineer (who already has a tf_weapon_builder)
 	TF_WEP_FEST(8, 3, "knife", 1080, "Festive Knife", null, "knife_draw", TF_AMMO.NONE, -1, -1, null)
 ]
