@@ -1,13 +1,84 @@
+		
+::TF_AMMO_PER_CLASS_PRIMARY <- [
+	0,
+	32,
+	25,
+	20
+	16,
+	150
+	200,
+	200,
+	20,
+	32,
+	0,
+]
 
-enum TF_AMMO
+::TF_AMMO_PER_CLASS_SECONDARY <- [
+	0,
+	36,
+	75,
+	32,
+	24,
+	150,
+	32,
+	32,
+	24,
+	200,
+	0,
+]
+class TF_C_WEPS
 {
-	NONE = 0
-	PRIMARY = 1
-	SECONDARY = 2
-	METAL = 3
-	GRENADES1 = 4 // e.g. Sandman, Jarate, Sandvich
-	GRENADES2 = 5 // e.g. Mad Milk, Bonk,
-	GRENADES3 = 6 // e.g. Spells
+	static prefix = "tf_weapon_"
+	itemName	= null
+	className	= null
+	slot		= null
+	itemID		= null
+	func		= null	
+	class_arms	= null
+	draw_seq	= null
+	ammoType	= null
+	clip		= null
+	reserve		= null
+	model		= null
+	wearable	= null
+	
+	constructor(name, weapon, Slot, id, Function, classarms, drawseq, ammoslot, prim, sec, wep_model, extra_wearable)
+	{
+		itemName	= name
+		if ( weapon == "demoshield" )
+		{
+			className = "tf_wearable_demoshield"
+		}
+		else if ( weapon == "razorback" )
+		{
+			className = "tf_wearable_razorback"
+		}
+		else if ( weapon == "tf_wearable" )
+		{
+			className = weapon
+		}
+		else { className = prefix + weapon }
+		slot		= Slot
+		itemID		= id
+		func		= Function
+		class_arms	= classarms
+		draw_seq	= drawseq
+		ammoType	= ammoslot
+		clip		= prim
+		reserve		= sec
+		model		= wep_model
+		wearable	= extra_wearable
+	}
+}
+// Unlike other registries, this one can only be searched by item name.
+::TF_CUSTOM_WEAPONS_REGISTRY <- [
+	TF_C_WEPS("Musk of Mann", "grenadelauncher", 1, 206, "GTFW_CW_Stats_test()", GTFW_ARMS.MEDIC, "sg_draw", TF_AMMO.PRIMARY, 4, 16, null, null)
+	TF_C_WEPS("Build Scroll", "pda_engineer_build", 4, 737, "GTFW_CW_Stats_test()", GTFW_ARMS.ENGINEER, "bld_draw", TF_AMMO.NONE, -1, -1, "models/weapons/w_models/w_scroll_engineer/w_scroll_build.mdl", null)
+	TF_C_WEPS("Build Scroll", "pda_engineer_destroy", 5, 26, "GTFW_CW_Stats_test()", GTFW_ARMS.ENGINEER, "pda_draw", TF_AMMO.NONE, -1, -1, "models/weapons/w_models/w_scroll_engineer/w_scroll_destroy.mdl", null)
+]
+
+::GTFW_CW_Stats_test <- function()
+{
 }
 
 ::GTFW_Saxxy <-
@@ -182,7 +253,13 @@ class TF_WEP_FEST
 // Reserve shooter is multiclass (Soldier/Pyro)
 // Panic attack is multi
 // Missing grappling hook/Mannpower things
+//-----------------------------------------------------------------------------
 // All
+//-----------------------------------------------------------------------------
+	TF_WEAPONS(0, 1, "shotgun", 199, null, "Shotgun", null, "draw", TF_AMMO.SECONDARY, 6, 32, null)
+	TF_WEAPONS(0, 2, "pistol", 22, 209, "Pistol", null, "p_draw", TF_AMMO.SECONDARY, 12, 36, null)
+	TF_WEAPONS(0, 2, "pistol", 30666, null, "C.A.P.P.E.R.", "CAPPER", "p_draw", TF_AMMO.SECONDARY, 12, 36, null)
+	TF_WEAPONS(0, 2, "pistol", 160, 294, "Lugermorph", "Luger", "pstl_draw", TF_AMMO.SECONDARY, 12, 36, null)
 	TF_WEAPONS(0, 7, "spellbook", 1070, null, "Basic Spellbook", "Spellbook Magazine", "spell_draw", TF_AMMO.GRENADES3, -1, -1, null)
 	TF_WEAPONS(0, 7, "spellbook", 1069, null, "Halloween Spellbook", "Fancy Spellbook", "spell_draw", TF_AMMO.GRENADES3, -1, -1, "models/player/items/all_class/hwn_spellbook_complete.mdl")
 	TF_WEAPONS(0, 3, "saxxy", 264, null, "Frying Pan", "Pan", "melee_allclass_draw", TF_AMMO.NONE, -1, -1, null)
@@ -197,7 +274,9 @@ class TF_WEP_FEST
 	TF_WEAPONS(0, 3, "saxxy", 1123, null, "Necro Smasher", "Smasher", "melee_allclass_draw", TF_AMMO.NONE, -1, -1, null)
 	TF_WEAPONS(0, 3, "saxxy", 30758, null, "Prinny Machete", "Machete", "melee_allclass_draw", TF_AMMO.NONE, -1, -1, null)
 	
+//-----------------------------------------------------------------------------
 // Scout
+//-----------------------------------------------------------------------------
 	TF_WEAPONS(1, 1, "scattergun", 13, 200, "Scattergun", "Scatter Gun", "sg_draw", TF_AMMO.PRIMARY, 6, 32, null)
 	TF_WEAPONS(1, 1, "scattergun", 45, null, "Force-A-Nature", "FAN", "db_draw", TF_AMMO.PRIMARY, 2, 32, null)
 	TF_WEAPONS(1, 1, "handgun_scout_primary", 220, null, "Shortstop", null, "ss_draw", TF_AMMO.PRIMARY, 4, 32, null)
@@ -205,16 +284,13 @@ class TF_WEP_FEST
 	TF_WEAPONS(1, 1, "pep_brawler_blaster", 772, null, "Baby Face's Blaster", "BFB", "sg_draw", TF_AMMO.PRIMARY, 4, 32, null)
 	TF_WEAPONS(1, 1, "scattergun", 1103, null, "Back Scatter", null, "sg_draw", TF_AMMO.PRIMARY, 4, 32, null)
 	
-	TF_WEAPONS(1, 2, "pistol_scout", 23, 209, "Scout Pistol", null, "p_draw", TF_AMMO.SECONDARY, 12, 36, null)
 	TF_WEAPONS(1, 2, "lunchbox_drink", 46, null, "Bonk! Atomic Punch", "Bonk", "ed_draw", TF_AMMO.GRENADES2, 1, -1, null)
 	TF_WEAPONS(1, 2, "lunchbox_drink", 163, null, "Crit-a-Cola", "CAC", "ed_draw", TF_AMMO.GRENADES2, 1, -1, null)
 	TF_WEAPONS(1, 2, "jar_milk", 222, null, "Mad Milk", null, "ed_draw", TF_AMMO.GRENADES2, 1, -1, null)
 	TF_WEAPONS(1, 2, "handgun_scout_secondary", 449, null, "Winger", null, "p_draw", TF_AMMO.SECONDARY, 5, 36, null)
 	TF_WEAPONS(1, 2, "handgun_scout_secondary", 773, null, "Pretty Boy's Pocket Pistol", "PBPP", "p_draw", TF_AMMO.SECONDARY, 9, 36, null)
 	TF_WEAPONS(1, 2, "cleaver", 812, 833, "Flying Guillotine", "Cleaver", "cleave_draw", TF_AMMO.GRENADES2, 1, -1, null)
-	TF_WEAPONS(1, 2, "pistol_scout", 160, 294, "Lugermorph", "Luger", "p_draw", TF_AMMO.SECONDARY, 12, 36, null)
 	TF_WEAPONS(1, 2, "jar_milk", 1121, null, "Mutated Milk", null, "ed_draw", TF_AMMO.GRENADES2, 1, -1, null)
-	TF_WEAPONS(1, 2, "pistol", 30666, null, "Scout C.A.P.P.E.R.", "Scout CAPPER", "p_draw", TF_AMMO.SECONDARY, 12, 36, null)
 	
 	TF_WEAPONS(1, 3, "bat", 0, 190, "Bat", null, "b_draw", TF_AMMO.NONE, -1, -1, null)
 	TF_WEAPONS(1, 3, "bat_wood", 44, null, "Sandman", null, "wb_draw", TF_AMMO.GRENADES1, 1, -1, null)
@@ -229,7 +305,9 @@ class TF_WEP_FEST
 	TF_WEAPONS(1, 3, "bat", 572, null, "Unarmed Combat", "Spy Arm", "b_draw", TF_AMMO.NONE, -1, -1, null)
 	TF_WEAPONS(1, 3, "bat", 30667, null, "Batsaber", null, "b_draw", TF_AMMO.NONE, -1, -1, null)
 	
+//-----------------------------------------------------------------------------
 // Solly
+//-----------------------------------------------------------------------------
 	TF_WEAPONS(3, 1, "rocketlauncher", 18, 205, "Rocket Launcher", "RL", "dh_draw", TF_AMMO.PRIMARY, 4, 20, null)
 	TF_WEAPONS(3, 1, "rocketlauncher_directhit", 127, null, "Direct Hit", "DH", "dh_draw", TF_AMMO.PRIMARY, 4, 20, null)
 	TF_WEAPONS(3, 1, "rocketlauncher", 228, null, "Black Box", null, "dh_draw", TF_AMMO.PRIMARY, 3, 20, null)
@@ -258,7 +336,9 @@ class TF_WEP_FEST
 	TF_WEAPONS(3, 3, "shovel", 447, null, "Disciplinary Action", "DA", "s_draw", TF_AMMO.NONE, -1, -1, null)
 	TF_WEAPONS(3, 3, "shovel", 775, null, "Escape Plan", null, "s_draw", TF_AMMO.NONE, -1, -1, null)
 
+//-----------------------------------------------------------------------------
 // Pyro
+//-----------------------------------------------------------------------------
 	TF_WEAPONS(7, 1, "flamethrower", 21, 208, "Flame Thrower", "Flamethrower", "ft_draw", TF_AMMO.PRIMARY, 200, -1, null)
 	TF_WEAPONS(7, 1, "flamethrower", 40, null, "Backburner", null, "ft_draw", TF_AMMO.PRIMARY, 200, -1, null)
 	TF_WEAPONS(7, 1, "flamethrower", 215, null, "Degreaser", null, "ft_draw", TF_AMMO.PRIMARY, 200, -1, null)
@@ -288,7 +368,9 @@ class TF_WEP_FEST
 	TF_WEAPONS(7, 3, "breakable_sign", 813, 834, "Neon Annihilator", null, "fa_draw", TF_AMMO.NONE, -1, -1, null)
 	TF_WEAPONS(7, 3, "slap", 1181, null, "Hot Hand", "Slap Glove", "slap_draw", TF_AMMO.NONE, -1, -1, null)
 
+//-----------------------------------------------------------------------------
 // Demo
+//-----------------------------------------------------------------------------
 	TF_WEAPONS(4, 1, "grenadelauncher", 19, 206, "Grenade Launcher", null, "g_draw", TF_AMMO.PRIMARY, 4, 16, null)
 	TF_WEAPONS(4, 1, "grenadelauncher", 308, null, "Loch-n-Load", "Loch", "g_draw", TF_AMMO.PRIMARY, 3, 16, null)
 	TF_WEAPONS(4, 1, "tf_wearable", 405, null, "Ali Baba's Wee Booties", "Booties", "", TF_AMMO.NONE, -1, -1, null)
@@ -316,7 +398,9 @@ class TF_WEP_FEST
 	TF_WEAPONS(4, 3, "bottle", 609, null, "Scottish Handshake", null, "b_draw", TF_AMMO.NONE, -1, -1, null)
 
 
+//-----------------------------------------------------------------------------
 // Heavy
+//-----------------------------------------------------------------------------
 	TF_WEAPONS(6, 1, "minigun", 15, 202, "Minigun", "Sasha", "m_draw", TF_AMMO.PRIMARY, 200, -1, null)
 	TF_WEAPONS(6, 1, "minigun", 41, null, "Natascha", null, "m_draw", TF_AMMO.PRIMARY, 200, -1, null)
 	TF_WEAPONS(6, 1, "minigun", 298, null, "Iron Curtain", null, "m_draw", TF_AMMO.PRIMARY, 200, -1, null)
@@ -345,17 +429,18 @@ class TF_WEP_FEST
 	TF_WEAPONS(6, 3, "fists", 1100, null, "Bread Bite", "Bread GRU", "breadglove_draw_A", TF_AMMO.NONE, -1, -1, null)
 	TF_WEAPONS(6, 3, "fists", 1184, null, "Gloves of Running Urgently MvM", "GRU MVM", "bg_draw", TF_AMMO.NONE, -1, -1, null)
 	
+//-----------------------------------------------------------------------------
 // Engineer
-	TF_WEAPONS(9, 1, "shotgun_primary", 9, 199, "Shotgun Primary", "Engineer Shotgun", "fj_draw", TF_AMMO.PRIMARY, 6, 32, null)
+//-----------------------------------------------------------------------------
+	TF_WEAPONS(9, 1, "shotgun_primary", 9, null, "Shotgun Primary", "Engineer Shotgun", "fj_draw", TF_AMMO.PRIMARY, 6, 32, null)
 	TF_WEAPONS(9, 1, "sentry_revenge", 141, null, "Frontier Justice", "FJ", "fj_draw", TF_AMMO.PRIMARY, 3, 32, null)
 	TF_WEAPONS(9, 1, "shotgun_primary", 527, null, "Widowmaker", null, "fj_draw", TF_AMMO.METAL, 200, -1, null)
 	TF_WEAPONS(9, 1, "drg_pomson", 588, null, "Pomson 6000", "Pomson", "pomson_draw", TF_AMMO.PRIMARY, 4, -1, null)
 	TF_WEAPONS(9, 1, "shotgun_building_rescue", 997, null, "Rescue Ranger", null, "fj_draw", TF_AMMO.PRIMARY, 4, 20, null)
 	
-	TF_WEAPONS(9, 2, "pistol", 22, 209, "Engineer Pistol", null, "pstl_draw", TF_AMMO.SECONDARY, 12, 200, null)
+	TF_WEAPONS(0, 2, "pistol", 22, null, "Engineer Pistol", null, "pstl_draw", TF_AMMO.SECONDARY, 12, 200, null)	//ID doesn't exist
 	TF_WEAPONS(9, 2, "laser_pointer", 140, null, "Wrangler", null, "wgl_draw", TF_AMMO.NONE, -1, -1, null)
 	TF_WEAPONS(9, 2, "mechanical_arm", 528, null, "Short Circuit", null, "pstl_draw", TF_AMMO.METAL, 200, -1, null)
-	TF_WEAPONS(9, 2, "pistol", 30666, null, "Engineer C.A.P.P.E.R.", "Engineer CAPPER", "p_draw", TF_AMMO.SECONDARY, 12, 200, null)
 	
 	TF_WEAPONS(9, 3, "wrench", 7, 197, "Wrench", null, "pdq_draw", TF_AMMO.NONE, -1, -1, null)
 	TF_WEAPONS(9, 3, "robot_arm", 142, null, "Gunslinger", null, "gun_draw", TF_AMMO.NONE, -1, -1, null)
@@ -368,7 +453,9 @@ class TF_WEP_FEST
 	TF_WEAPONS(9, 5, "pda_engineer_destroy", 26, null, "Destruction PDA", "Destroy PDA", "pda_draw", TF_AMMO.NONE, -1, -1, null)
 	TF_WEAPONS(9, 6, "builder", 28, null, "Engineer Toolbox", "Toolbox", "box_draw", TF_AMMO.NONE, -1, -1, null)
 	
+//-----------------------------------------------------------------------------
 // Medic
+//-----------------------------------------------------------------------------
 	TF_WEAPONS(5, 1, "syringegun_medic", 17, 204, "Syringe Gun", "Syringegun", "sg_draw", TF_AMMO.PRIMARY, 40, 150, null)
 	TF_WEAPONS(5, 1, "syringegun_medic", 36, null, "Blutsauger", null, "sg_draw", TF_AMMO.PRIMARY, 40, 150, null)
 	TF_WEAPONS(5, 1, "crossbow", 305, null, "Crusader's Crossbow", "Crossbow", "sg_draw", TF_AMMO.PRIMARY, 1, 38, null)
@@ -385,7 +472,9 @@ class TF_WEP_FEST
 	TF_WEAPONS(5, 3, "bonesaw", 304, null, "Amputator", null, "bs_draw", TF_AMMO.NONE, -1, -1, null)
 	TF_WEAPONS(0, 3, "bonesaw", 413, null, "Solemn Vow", null, "melee_allclass_draw", TF_AMMO.NONE, -1, -1, null)
 
+//-----------------------------------------------------------------------------
 // Sniper
+//-----------------------------------------------------------------------------
 	TF_WEAPONS(2, 1, "sniperrifle", 14, 201, "Sniper Rifle", null, "draw", TF_AMMO.PRIMARY, 25, -1, null)
 	TF_WEAPONS(2, 1, "compound_bow", 56, null, "Huntsman", null, "bw_draw", TF_AMMO.PRIMARY, 1, 12, null)
 	TF_WEAPONS(2, 1, "sniperrifle", 230, null, "Sydney Sleeper", null, "draw", TF_AMMO.PRIMARY, 25, -1, null)
@@ -410,7 +499,9 @@ class TF_WEP_FEST
 	TF_WEAPONS(2, 3, "club", 232, null, "Bushwacka", null, "m_draw", TF_AMMO.NONE, -1, -1, null)
 	TF_WEAPONS(2, 3, "club", 401, null, "Shahanshah", null, "m_draw", TF_AMMO.NONE, -1, -1, null)
 		
+//-----------------------------------------------------------------------------
 // Spy
+//-----------------------------------------------------------------------------
 	TF_WEAPONS(8, 1, "revolver", 24, 210, "Revolver", null, "draw", TF_AMMO.PRIMARY, 6, 24, null)
 	TF_WEAPONS(8, 1, "revolver", 61, null, "Ambassador", null, "draw", TF_AMMO.PRIMARY, 6, 24, null)
 	TF_WEAPONS(8, 1, "revolver", 161, null, "Big Kill", null, "draw", TF_AMMO.PRIMARY, 6, 24, null)
@@ -441,10 +532,11 @@ class TF_WEP_FEST
 	TF_WEAPONS(8, 5, "invis", 297, null, "Enthusiast's Timepiece", "Timepiece", "offhand_draw", TF_AMMO.NONE, -1, -1, null)
 	TF_WEAPONS(8, 5, "invis", 947, null, "Quackenbirdt", null, "offhand_draw", TF_AMMO.NONE, -1, -1, null)
 ]
+
 ::TF_WEAPONS_ALL_WARPAINTSnBOTKILLERS <- [
 //Botkillers listed first, then warpaints
 	TF_WEAPONS_RESKIN(0, 2, "shotgun", 15003, 15016, 15044, 15047, 15085, 15109, 15132, 15133, 15152, null, null, null, null, "draw", TF_AMMO.SECONDARY, 6, 32)
-	TF_WEAPONS_RESKIN(1, 2, "pistol", 15013, 15018, 15035, 15041, 15046, 15056, 15060, 15061, 15100, 15101, 15102, 15126, 15148, "p_draw", TF_AMMO.SECONDARY, 12, 36)
+	TF_WEAPONS_RESKIN(0, 2, "pistol", 15013, 15018, 15035, 15041, 15046, 15056, 15060, 15061, 15100, 15101, 15102, 15126, 15148, "p_draw", TF_AMMO.SECONDARY, 12, 36)
 	
 	TF_WEAPONS_RESKIN(1, 1, "scattergun", 799, 808, 888, 897, 906, 915, 966, 973, null, null, null, null, 15157, "sg_draw", TF_AMMO.PRIMARY, 6, 32)
 	TF_WEAPONS_RESKIN(1, 1, "scattergun", 15002, 15015, 15021, 15029, 15036, 15053, 15065, 15069, 15106, 15107, 15108, 15131, 15151, "sg_draw", TF_AMMO.PRIMARY, 6, 32)
@@ -523,5 +615,198 @@ class TF_WEP_FEST
 	TF_WEP_FEST(8, 1, "revolver", 1142, "Festive Revolver", null, "draw", TF_AMMO.PRIMARY, 6, 24, null)
 	TF_WEP_FEST(8, 1, "revolver", 1006, "Festive Ambassador", null, "draw", TF_AMMO.PRIMARY, 6, 24, null)
 	TF_WEP_FEST(8, 2, "builder", 1080, "Festive Sapper", null, "c_sapper_draw", TF_AMMO.NONE, -1, -1, null) //testing to see what slot2 does; need to test if it reacts well on Engineer (who already has a tf_weapon_builder)
-	TF_WEP_FEST(8, 3, "knife", 1080, "Festive Knife", null, "knife_draw", TF_AMMO.NONE, -1, -1, null)
+	TF_WEP_FEST(8, 3, "knife", 665, "Festive Knife", null, "knife_draw", TF_AMMO.NONE, -1, -1, null)
+]
+
+
+::SearchAllWeapons <-
+[
+	"tf_weapon_bat",
+	"tf_weapon_bat_fish",
+	"tf_weapon_bat_giftwrap",
+	"tf_weapon_bat_wood",
+	"tf_weapon_bonesaw",
+	"tf_weapon_bottle",
+	"tf_weapon_breakable_sign",
+	"tf_weapon_buff_item",
+	"tf_weapon_builder",
+	"tf_weapon_cannon",
+	"tf_weapon_charged_smg",
+	"tf_weapon_cleaver",
+	"tf_weapon_club",
+	"tf_weapon_compound_bow",
+	"tf_weapon_crossbow",
+	"tf_weapon_drg_pomson",
+	"tf_weapon_fireaxe",
+	"tf_weapon_fists",
+	"tf_weapon_flamethrower",
+	"tf_weapon_flaregun",
+	"tf_weapon_flaregun_revenge",
+	"tf_weapon_grapplinghook",
+	"tf_weapon_grenadelauncher",
+	"tf_weapon_handgun_scout_primary",
+	"tf_weapon_handgun_scout_secondary",
+	"tf_weapon_invis",
+	"tf_weapon_jar",
+	"tf_weapon_jar_milk",
+	"tf_weapon_jar_gas",
+	"tf_weapon_katana",
+	"tf_weapon_knife",
+	"tf_weapon_laser_pointer",
+	"tf_weapon_lunchbox",
+	"tf_weapon_lunchbox_drink",
+	"tf_weapon_mechanical_arm",
+	"tf_weapon_medigun",
+	"tf_weapon_minigun",
+	"tf_weapon_parachute",
+	"tf_weapon_parachute_primary",
+	"tf_weapon_parachute_secondary",
+	"tf_weapon_particle_cannon",
+	"tf_weapon_passtime_gun",
+	"tf_weapon_pda_engineer_build",
+	"tf_weapon_pda_engineer_destroy",
+	"tf_weapon_pda_spy",
+	"tf_weapon_pep_brawler_blaster",
+	"tf_weapon_pipebomblauncher",
+	"tf_weapon_pistol",
+	"tf_weapon_pistol_scout",
+	"tf_weapon_raygun",
+	"tf_weapon_revolver",
+	"tf_weapon_robot_arm",
+	"tf_weapon_rocketlauncher",
+	"tf_weapon_rocketlauncher_airstrike",
+	"tf_weapon_rocketlauncher_directhit",
+	"tf_weapon_rocketlauncher_fireball",
+	"tf_weapon_rocketpack",
+	"tf_weapon_sapper",
+	"tf_weapon_scattergun",
+	"tf_weapon_sentry_revenge",
+	"tf_weapon_shotgun_hwg",
+	"tf_weapon_shotgun_primary",
+	"tf_weapon_shotgun_pyro",
+	"tf_weapon_shotgun_building_rescue",
+	"tf_weapon_shotgun_soldier",
+	"tf_weapon_shovel",
+	"tf_weapon_slap",
+	"tf_weapon_smg",
+	"tf_weapon_sniperrifle",
+	"tf_weapon_sniperrifle_classic",
+	"tf_weapon_sniperrifle_decap",
+	"tf_weapon_soda_popper",
+	"tf_weapon_spellbook",
+	"tf_weapon_stickbomb",
+	"tf_weapon_sword",
+	"tf_weapon_syringegun_medic",
+	"tf_weapon_wrench",
+]
+::SearchPrimaryWeapons <-
+[
+	"tf_weapon_cannon",
+	"tf_weapon_compound_bow",
+	"tf_weapon_crossbow",
+	"tf_weapon_drg_pomson",
+	"tf_weapon_flamethrower",
+	"tf_weapon_grenadelauncher",
+	"tf_weapon_handgun_scout_primary",
+	"tf_weapon_minigun",
+	"tf_weapon_parachute",
+	"tf_weapon_parachute_primary",
+	"tf_weapon_particle_cannon",
+	"tf_weapon_pep_brawler_blaster",
+	"tf_weapon_revolver",
+	"tf_weapon_rocketlauncher",
+	"tf_weapon_rocketlauncher_airstrike",
+	"tf_weapon_rocketlauncher_directhit",
+	"tf_weapon_rocketlauncher_fireball",
+	"tf_weapon_scattergun",
+	"tf_weapon_sentry_revenge",
+	"tf_weapon_shotgun_primary",
+	"tf_weapon_sniperrifle",
+	"tf_weapon_sniperrifle_classic",
+	"tf_weapon_sniperrifle_decap",
+	"tf_weapon_soda_popper",
+	"tf_weapon_syringegun_medic",
+]
+::SearchSecondaryWeapons <-
+[
+	"tf_weapon_buff_item",
+	"tf_weapon_charged_smg",
+	"tf_weapon_cleaver",
+	"tf_weapon_flaregun",
+	"tf_weapon_flaregun_revenge",
+	"tf_weapon_handgun_scout_secondary",
+	"tf_weapon_jar",
+	"tf_weapon_jar_milk",
+	"tf_weapon_jar_gas",
+	"tf_weapon_laser_pointer",
+	"tf_weapon_lunchbox",
+	"tf_weapon_lunchbox_drink",
+	"tf_weapon_mechanical_arm",
+	"tf_weapon_medigun",
+	"tf_weapon_parachute",
+	"tf_weapon_parachute_secondary",
+	"tf_weapon_pipebomblauncher",
+	"tf_weapon_pistol",
+	"tf_weapon_pistol_scout",
+	"tf_weapon_raygun",
+	"tf_weapon_rocketpack",
+	"tf_weapon_shotgun_hwg",
+	"tf_weapon_shotgun_pyro",
+	"tf_weapon_shotgun_soldier",
+]
+::SearchMeleeWeapons <-
+[
+	"tf_weapon_bat",
+	"tf_weapon_bat_fish",
+	"tf_weapon_bat_giftwrap",
+	"tf_weapon_bat_wood",
+	"tf_weapon_bonesaw",
+	"tf_weapon_bottle",
+	"tf_weapon_breakable_sign",
+	"tf_weapon_club",
+	"tf_weapon_fireaxe",
+	"tf_weapon_fists",
+	"tf_weapon_katana",
+	"tf_weapon_knife",
+	"tf_weapon_robot_arm",
+	"tf_weapon_shovel",
+	"tf_weapon_slap",
+	"tf_weapon_stickbomb",
+	"tf_weapon_sword",
+	"tf_weapon_wrench",
+]
+::SearchMiscWeapons <-
+[
+	"tf_weapon_builder",
+	"tf_weapon_grapplinghook",
+	"tf_weapon_invis",
+	"tf_weapon_passtime_gun",
+	"tf_weapon_pda_engineer_build",
+	"tf_weapon_pda_engineer_destroy",
+	"tf_weapon_pda_spy",
+	"tf_weapon_sapper",
+	"tf_weapon_spellbook",
+	"tf_wearable",
+	"tf_wearable_demoshield",
+]
+::SearchSlot4Weapons <-
+[
+	"tf_weapon_pda_spy",
+	"tf_weapon_pda_engineer_build",
+]
+::SearchSlot5Weapons <-
+[
+	"tf_weapon_invis",
+	"tf_weapon_pda_engineer_destroy",
+]
+::SearchSlot6Weapons <-
+[
+	"tf_weapon_builder",
+	"tf_weapon_sapper",
+]
+::SearchSlot7Weapons <-
+[
+	"tf_weapon_grapplinghook",
+	"tf_weapon_passtime_gun",
+	"tf_weapon_spellbook",
 ]
