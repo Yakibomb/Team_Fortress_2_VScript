@@ -19,6 +19,31 @@ function OnGameEvent_post_inventory_application(params)
 	{
 		local player = GetPlayerFromUserID(params.userid)
 		player.GTFW_Cleanup()	//<-Add this to your own player_death event. It must be at the beginning!
+	//	player.GiveWeapon(25)
+	//	player.GiveWeapon("Tomislav")
+		if ( player.GetPlayerClass() == 8 ) {
+
+		//	local sword = player.GiveWeapon("Knife")
+		//	local sword = player.GiveWeapon("Revolver")
+		}
+		else if ( player.GetPlayerClass() == 1 ) {
+			local cb = player.GiveWeapon("Crossbow")
+			player.SetCustomWeapon(cb, "models/weapons/c_models/c_medic_wood_dart_rifle/c_medic_wood_dart_rifle.mdl", GTFW_ARMS.MEDIC)
+			if ( player.ReturnWeapon("Pistol") != null ) {
+				player.DeleteWeapon("secondary")
+			//	player.GiveWeapon("Wrench")
+			//	player.SetCustomWeapon("Wrench", "models/weapons/w_models/w_rapier_spy/w_rapier.mdl", "models/weapons/c_models/c_scout_arms.mdl")
+			}
+		}
+		else if ( player.GetPlayerClass() == 9 )
+		{
+		//	local chainwrench = player.GiveWeapon("Machete")
+		//	player.SetCustomWeapon("melee", "models/weapons/c_models/c_harmony_of_repair/c_harmony_of_repair.mdl", null)
+		//	chainwrench.AddAttribute("maxammo metal increased", 2.0, -1)
+		//	player.GiveWeapon(28)
+		//	player.SetCustomWeapon("Build PDA", "models/weapons/w_models/w_scroll_engineer/w_scroll_build.mdl", null )
+		//	player.SetCustomWeapon("Destroy PDA", "models/weapons/w_models/w_scroll_engineer/w_scroll_destroy.mdl", null )
+		}
 	}
 }
 	__CollectEventCallbacks(this, "OnGameEvent_", "GameEventCallbacks", RegisterScriptGameEventListener)
@@ -45,11 +70,10 @@ Notes to Users
  - When using GiveWeapon, weapon strings for unlocks don't need "The " in them. (i.e. "The Sandvich" is invalid, but "Sandvich" is acceptable)
  --> Also accepts handles, as well as item index values (from items_game.txt)
  - GiveWeapon also returns the weapon as a handle. So you can add attributes to the weapon!
- - Add function `CTFPlayer.GTFW_Cleanup` to your `player_death` and `post_inventory_application` events to delete unused weapons/viewmodels attached to the player
- --> Needs a player handle to clear weapons from
+ - Given/Custom weapons don't delete themselves on death or respawn. 
+ ->Add function `CTFPlayer.GTFW_Cleanup` to your `player_death` and `post_inventory_application` events to delete any unused weapons/viewmodels attached to the player.
  --> Please place at the beginning of your "OnGameEvent_"s!
- --> Place these inside your "OnGameEvent_player_death".
- --> Place these inside your "OnGameEvent_post_inventory_application".
+ --> Needs a player handle to clear weapons from.
 		
 PUBLIC OPERATIONS
  Made to make giving weapons, easy! Also supports custom weapons!
@@ -70,6 +94,10 @@ PUBLIC OPERATIONS
 		- Enables a weapon if it was disabled by the prior command
 	CTFPlayer.ReturnWeapon(weapon)
 		- Searches weapon on player and returns as handle.
+	CTFPlayer.ReturnWeaponTable(string_or_id)
+		Find item by string or item ID
+	ReturnWeaponBySlotBool(weapon, slot)
+		Finds equip if `weapon.GetSlot()` matches `slot` parameter
 	CTFPlayer.SetCustomWeapon(baseitem, custom_weapon_model, custom_arms_model)
 		- MAKES YOU A NEW CUSTOM WEAPON! Does not include stats.
 		- Returns handle so you can add the stats yourself!
@@ -94,12 +122,8 @@ PRIVATE OPERATIONS
 		Updates the think script on tf_viewmodel. Branches from AddWeapon.
 	CTFPlayer.SwitchToActive(NewGun)
 		Forcefully switches to given weapon. If null, switches to first weapon it finds.
-	CTFPlayer.GTFW_FindEquipByStringOrID(string_or_id)
-		Find item by string or item ID
-	GTFW_FindEquipBySlot(slot, weapon)
-		Finds equip if it has parameters like "primary", "secondary", etc.
-		Returns true if it found anything, or false if not
-	CheckIfEquipOnPlayer(item_classname)
+		Returns true if weapon matches slot, else false
+	CTFPlayer.HasWeaponClassname(item_classname)
 		Returns true if classname ent is on player, or false if not
 	GTFW_WepFix(exists)
 		Updates classnames for shotguns, pistols, saxxy, etc, before creating the weapon.
@@ -307,21 +331,37 @@ enum GTFW_ARMS
 
 ::CTFPlayer.GTFW_FindEquip <- function(weapon)
 {
-	local baseitem = this.GTFW_FindEquipByStringOrID(weapon)
-	local ItemID = NetProps.GetPropInt(weapon, "m_AttributeManager.m_Item.m_iItemDefinitionIndex")
-	
-	if ( baseitem != null ) {
-		return baseitem
-	} else if ( ItemID != null ) {
-		baseitem = this.GTFW_FindEquipByStringOrID(ItemID)
+	if ( SearchBySlotsParameters.find(weapon) != null ) {
+		for (local i = 0; i < GLOBAL_WEAPON_COUNT; i++)
+		{
+			local wep = NetProps.GetPropEntityArray(this, "m_hMyWeapons", i)
+			
+			if ( wep != null )
+			{
+				if ( GTFW_FindEquipBySlot(searched_weapon, wep) )
+				{
+					return wep
+				}
+			}
+		}
+	}
+	else {
+		local baseitem = this.ReturnWeaponTable(weapon)
+		local ItemID = NetProps.GetPropInt(weapon, "m_AttributeManager.m_Item.m_iItemDefinitionIndex")
+		
 		if ( baseitem != null ) {
 			return baseitem
+		} else if ( ItemID != null ) {
+			baseitem = this.ReturnWeaponTable(ItemID)
+			if ( baseitem != null ) {
+				return baseitem
+			}
 		}
 	}
 	return null
 }
 
-::CTFPlayer.GTFW_FindEquipByStringOrID <- function(baseitem)
+::CTFPlayer.ReturnWeaponTable <- function(baseitem)
 {
 	local truefalse = true
 	foreach (exists in TF_WEAPONS_ALL)
@@ -378,10 +418,6 @@ enum GTFW_ARMS
 				|| exists.itemID10 == baseitem || exists.itemID11 == baseitem || exists.itemID12 == baseitem
 				|| exists.itemID13 == baseitem)
 				{
-					if ( exists.className == "tf_weapon_saxxy" )
-					{
-						exists.className = GTFW_Saxxy[this.GetPlayerClass()]
-					}
 					if ( exists.itemID == baseitem ) {
 						exists.itemID = exists.itemID
 					}
@@ -464,19 +500,17 @@ enum GTFW_ARMS
 	return exists
 }
 
-::CheckIfEquipOnPlayer <- function(item_classname)
+::CTFPlayer.HasWeaponClassname <- function(item_classname)
 {
 	for (local i = 0; i < GLOBAL_WEAPON_COUNT; i++)
 	{
 		local wep = NetProps.GetPropEntityArray(this, "m_hMyWeapons", i)
 		
 		if ( wep != null && wep.GetClassname() == item_classname ) {
-			return false
-		}
-		else if ( i = GLOBAL_WEAPON_COUNT - 1) {
 			return true
 		}
 	}
+	return false
 }
 
 //FUNCTION: Don't use by itself. Used to find switch to a gun forcefully.
@@ -713,7 +747,7 @@ enum GTFW_ARMS
 			{
 				wep = player.GetActiveWeapon()
 		
-		//debug messages
+		/*//debug messages
 				printl("WEAPON ACTIVE "+wep)
 				printl( PlayerLoadoutGlobal_ClassArms[player][wep.GetClassname()] )
 				printl( PlayerLoadoutGlobal_DrawSeq[player][wep.GetClassname()] )
@@ -896,32 +930,7 @@ enum GTFW_ARMS
 
 		if ( CVAR_GTFW_GIVEWEAPON_REPLACE_WEAPONS && wep != null ) {
 			DeletedWeapon = wep.entindex()
-			if ( Slot == 0 && SearchPrimaryWeapons.find(wep.GetClassname()) != null )
-			{
-				wep.Kill()
-			}
-			else if ( Slot == 1 && SearchSecondaryWeapons.find(wep.GetClassname()) != null )
-			{
-				wep.Kill()
-			}
-			else if ( Slot == 2 && SearchMeleeWeapons.find(wep.GetClassname()) != null )
-			{
-				wep.Kill()
-			}
-			else if ( Slot == 3 && SearchSlot3Weapons.find(wep.GetClassname()) != null )
-			{
-				wep.Kill()
-			}
-			else if ( Slot == 4 && SearchSlot4Weapons.find(wep.GetClassname()) != null )
-			{
-				wep.Kill()
-			}
-			else if ( Slot == 5 && SearchSlot5Weapons.find(wep.GetClassname()) != null )
-			{
-				wep.Kill()
-			}
-			else if ( Slot == 6 && SearchSlot6Weapons.find(wep.GetClassname()) != null )
-			{
+			if ( wep.GetSlot() == Slot ) {
 				wep.Kill()
 			}
 		}
@@ -965,11 +974,13 @@ enum GTFW_ARMS
 		local aThreshold = 0
 		if ( YourNewGunSaxtonApproved.GetPrimaryAmmoType() == TF_AMMO.PRIMARY ) {
 			aThreshold = TF_AMMO_PER_CLASS_PRIMARY[this.GetPlayerClass()]
-			YourNewGunSaxtonApproved.AddAttribute("hidden primary max ammo bonus", (AmmoReserve.tofloat() / aThreshold.tofloat()), -1)
+			this.AddCustomAttribute("hidden primary max ammo bonus", (AmmoReserve.tofloat() / aThreshold.tofloat()), -1)
+			//YourNewGunSaxtonApproved.AddAttribute("hidden primary max ammo bonus", (AmmoReserve.tofloat() / aThreshold.tofloat()), -1)	//broken right now
 		}
 		else if ( YourNewGunSaxtonApproved.GetPrimaryAmmoType() == TF_AMMO.SECONDARY ) {
 			aThreshold = TF_AMMO_PER_CLASS_SECONDARY[this.GetPlayerClass()]
-			YourNewGunSaxtonApproved.AddCustomAttribute("hidden secondary max ammo penalty", (AmmoReserve.tofloat() / aThreshold.tofloat()), -1)
+			this.AddCustomAttribute("hidden secondary max ammo penalty", (AmmoReserve.tofloat() / aThreshold.tofloat()), -1)
+			//YourNewGunSaxtonApproved.AddAttribute("hidden secondary max ammo penalty", (AmmoReserve.tofloat() / aThreshold.tofloat()), -1)	//broken right now
 		}
 		else if ( YourNewGunSaxtonApproved.GetPrimaryAmmoType() == TF_AMMO.METAL && this.GetPlayerClass() != 9 )
 		{
@@ -990,16 +1001,13 @@ enum GTFW_ARMS
 
 ::CTFPlayer.DeleteWeapon <- function(weapon)
 {
+	local DeleteThis = null
 //converts our weapon from string/ID to a classname...
 	local baseitem = this.GTFW_FindEquip(weapon)
-	if ( baseitem == null ) {
-		return null
+	if ( baseitem != null ) {
+		DeleteThis = baseitem.className
 	}
-	local DeleteThis = baseitem.className
 	
-	if ( this.CheckIfEquipOnPlayer(DeleteThis) ) {
-		return null
-	}
 	
 	local DeletedWeapon = null
 	local LOOPCOUNT_MAX = 1
@@ -1051,15 +1059,11 @@ enum GTFW_ARMS
 
 ::CTFPlayer.GiveWeaponEx <- function(searched_weapon, searched_itemID, new_weapon, new_itemID)
 {
+	local ReplaceThis = null
 //converts our weapon from string/ID to a classname...
 	local baseitem = this.GTFW_FindEquip(searched_weapon)
 	if ( baseitem == null ) {
-		return null
-	}
-	local ReplaceThis = baseitem.className
-//cancels the operation if we don't have this weapon...
-	if ( this.CheckIfEquipOnPlayer(ReplaceThis) ) {
-		return null
+		ReplaceThis = baseitem.className
 	}
 	
 //putting "a" here so it doesn't error with nothing in array[0]
@@ -1193,74 +1197,77 @@ enum GTFW_ARMS
 	returns true if it found anything
 
 */
-function GTFW_FindEquipBySlot(slot, wep)
+
+function ReturnWeaponBySlot(slot)
 {
-	if ( slot == "primary" || slot == "PRIMARY" || slot == "Primary" )
+	truefalse = true
+	foreach (exists in TF_CUSTOM_WEAPONS_REGISTRY)
 	{
-		if ( SearchPrimaryWeapons.find(wep.GetClassname()) != null )
+		if ( exists.slot == slot )
 		{
-			return true
+			truefalse = false
+			return exists
 		}
 	}
-	else if ( slot == "secondary" || slot == "SECONDARY" || slot == "Secondary" )
-	{
-		if ( SearchSecondaryWeapons.find(wep.GetClassname()) != null )
+	if ( truefalse ) {
+		foreach (exists in TF_WEAPONS_ALL)
 		{
-			return true
+			if ( exists.slot == slot )
+			{
+				truefalse = false
+				return exists
+			}
+		}
+		if ( truefalse ) {
+			foreach (exists in TF_WEAPONS_ALL_FESTIVE)
+			{
+				if ( exists.slot == slot )
+				{
+					truefalse = false
+					return exists
+				}
+			}
+			if ( truefalse ) {
+				foreach (exists in TF_WEAPONS_ALL_WARPAINTSnBOTKILLERS)
+				{
+					if ( exists.slot == slot )
+					{
+						return exists
+					}
+				}
+			}
 		}
 	}
-	else if ( slot == "melee" || slot == "MELEE" || slot == "Melee" )
-	{
-		if ( SearchMeleeWeapons.find(wep.GetClassname()) != null )
-		{
-			return true
-		}
-	}
-	else if ( slot == "misc" || slot == "MISC" || slot == "Misc" )
-	{
-		if ( SearchMiscWeapons.find(wep.GetClassname()) != null )
-		{
-			return true
-		}
-	}
-	else if ( slot == "slot3" || slot == "SLOT3" || slot == "Slot3" )
-	{
-		if ( SearchSlot3Weapons.find(wep.GetClassname()) != null )
-		{
-			return true
-		}
-	}
-	else if ( slot == "slot4" || slot == "SLOT4" || slot == "Slot4" )
-	{
-		if ( SearchSlot4Weapons.find(wep.GetClassname()) != null )
-		{
-			return true
-		}
-	}
-	else if ( slot == "slot5" || slot == "SLOT5" || slot == "Slot5" )
-	{
-		if ( SearchSlot5Weapons.find(wep.GetClassname()) != null )
-		{
-			return true
-		}
-	}
-	else if ( slot == "slot6" || slot == "SLOT6" || slot == "Slot6" )
-	{
-		if ( SearchSlot6Weapons.find(wep.GetClassname()) != null )
-		{
-			return true
-		}
-	}
-	else {
-		return false
-	}
+	return null
 }
-				
+::ReturnWeaponBySlotBool <- function(wep, slot)
+{
+	if ( type ( slot ) == "integer" ) {
+		if ( wep.GetSlot() == slot ) {
+			return true
+		}
+	}
+	return false
+}
+function GTFW_ReturnWeaponBySlotBool(wep, slot)
+{
+	if ( type ( slot ) == "integer" || slot == -0.0 ) {
+		local asdf = split(slot.tostring()+"a",abs(slot).tostring())[0]
+		if ( asdf == "-" )	//if slot checks as negative... test!
+		{
+			slot = abs(slot)
+			if ( wep.GetSlot() == slot )
+			{
+				return true
+			}
+		}
+	}
+	return false
+}
+
+
 /* FUNCTION: disables being able to switch to a weapon.
 	-> See top of script for more info
-	
- USE: hPlayer.DisableWeapon("tf_weapon_medigun", 998) //Disable only Vaccinator
- USE: hPlayer.DisableWeapon("secondary", -1) //Disable any secondary
 */
 
 ::CTFPlayer.DisableWeapon <- function(weapon)
@@ -1271,11 +1278,6 @@ function GTFW_FindEquipBySlot(slot, wep)
 		return null
 	}
 	local DisableThis = baseitem.className
-//cancels the operation if we don't have this weapon...
-	if ( this.CheckIfEquipOnPlayer(DisableThis) ) {
-		return null
-	}
-	printl("Pass")
 	
 	local BrokenGun = null
 	local wep = null
@@ -1293,7 +1295,7 @@ function GTFW_FindEquipBySlot(slot, wep)
 			
 			if ( wep != null )
 			{
-				if ( GTFW_FindEquipBySlot(weapon, wep) )
+				if ( GTFW_ReturnWeaponBySlotBool(wep, weapon) )
 				{
 					DisableThis = wep.GetClassname()
 				}
@@ -1309,6 +1311,9 @@ function GTFW_FindEquipBySlot(slot, wep)
 				}
 			}
 		}
+	}
+	if ( BrokenGun == null ) {
+		throw null
 	}
 	
 // switches to another weapon if active one was disabled
@@ -1345,7 +1350,7 @@ function GTFW_FindEquipBySlot(slot, wep)
 			
 			if ( wep != null )
 			{
-				if ( GTFW_FindEquipBySlot(weapon, wep) )
+				if ( GTFW_ReturnWeaponBySlotBool(wep, weapon) )
 				{
 					FixThis = wep.GetClassname()
 				}
@@ -1386,25 +1391,21 @@ function GTFW_FindEquipBySlot(slot, wep)
 	}
 
 	local YourGunFoundBySaxtonHale = null
-	local LOOPCOUNT_MAX = 1
-	
-	for (local LOOPCOUNT_CURRENT = 0; LOOPCOUNT_CURRENT < LOOPCOUNT_MAX; LOOPCOUNT_CURRENT++)
+
+	for (local i = 0; i < GLOBAL_WEAPON_COUNT; i++)
 	{
-		for (local i = 0; i < GLOBAL_WEAPON_COUNT; i++)
+		local wep = NetProps.GetPropEntityArray(this, "m_hMyWeapons", i)
+		
+		if ( wep != null )
 		{
-			local wep = NetProps.GetPropEntityArray(this, "m_hMyWeapons", i)
-			
-			if ( wep != null )
+			if ( GTFW_ReturnWeaponBySlotBool(wep, searched_weapon) )
 			{
-				if ( GTFW_FindEquipBySlot(searched_weapon, wep) )
-				{
-					GetThis = wep.GetClassname()
-				}
-				if ( wep.GetClassname() == GetThis )
-				{
-					YourGunFoundBySaxtonHale = wep
-					break
-				}
+				GetThis = wep.GetClassname()
+			}
+			if ( wep.GetClassname() == GetThis )
+			{
+				YourGunFoundBySaxtonHale = wep
+				break
 			}
 		}
 	}
@@ -1551,7 +1552,7 @@ change the baseitem's modelindex (which are class_arms) to the animations you wa
 	local draw_seq = baseitem.draw_seq
 
 //cancels the operation if we don't have this weapon...
-	if ( this.CheckIfEquipOnPlayer(CUSTOM_WEAPON) ) {
+	if ( this.HasWeaponClassname(CUSTOM_WEAPON) ) {
 		return null
 	}
 
@@ -1563,7 +1564,7 @@ change the baseitem's modelindex (which are class_arms) to the animations you wa
 		{
 			local wep = NetProps.GetPropEntityArray(this, "m_hMyWeapons", i)
 		
-			if ( wep != null && GTFW_FindEquipBySlot(weapon, wep) )
+			if ( wep != null && ReturnWeaponBySlotBool(wep, weapon) )
 			{
 				CUSTOM_WEAPON = wep
 				break
@@ -1634,5 +1635,6 @@ WIP: Give weapon, set custom model, give another new weapon, first weapon resets
 WIP: Fix bug with GiveWeapon into SetCustomWeapon
 WIP: Custom weapon database (basically just a table with stats)
 WIP: RegisterCustomWeapon
+TODO: "misc" toolbox engineer fix
 
 // End debug stuff */
