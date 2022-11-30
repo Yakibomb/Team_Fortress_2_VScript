@@ -1,5 +1,5 @@
 		
-::TF_AMMO_PER_CLASS_ <- [
+::TF_AMMO_PER_CLASS_PRIMARY <- [
 	0,
 	32,
 	25,
@@ -13,7 +13,7 @@
 	0,
 ]
 
-::TF_AMMO_PER_CLASS_ <- [
+::TF_AMMO_PER_CLASS_SECONDARY <- [
 	0,
 	36,
 	75,
