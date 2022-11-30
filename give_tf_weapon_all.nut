@@ -1,4 +1,13 @@
-		
+::TF_WEAPONSLOTS <- {
+  PRIMARY = -0.0
+  SECONDARY = -1
+  MELEE = -2
+  SLOT3 = -3
+  SLOT4 = -4
+  SLOT5 = -5
+  SLOT6 = -6
+}
+
 ::TF_AMMO_PER_CLASS_PRIMARY <- [
 	0,
 	32,
@@ -334,13 +343,13 @@ class TF_WEP_FEST
 //-----------------------------------------------------------------------------
 // Pyro
 //-----------------------------------------------------------------------------
-	TF_WEAPONS(7, 0, "flamethrower", 21, 208, "Flame Thrower", "Flamethrower", "ft_draw", 200, -1, null)
-	TF_WEAPONS(7, 0, "flamethrower", 40, null, "Backburner", null, "ft_draw", 200, -1, null)
-	TF_WEAPONS(7, 0, "flamethrower", 215, null, "Degreaser", null, "ft_draw", 200, -1, null)
-	TF_WEAPONS(7, 0, "flamethrower", 594, null, "Phlogistinator", "Phlog", "ft_draw", 200, -1, null)
-	TF_WEAPONS(7, 0, "flamethrower", 741, null, "Rainblower", null, "ft_draw", 200, -1, null)
-	TF_WEAPONS(7, 0, "rocketlauncher_fireball", 1178, null, "Dragon's Fury", null, "ft_draw", 200, -1, null)
-	TF_WEAPONS(7, 0, "flamethrower", 30474, null, "Nostromo Napalmer", "Alien Flamethrower", "ft_draw", 200, -1, null)
+	TF_WEAPONS(7, 0, "flamethrower", 21, 208, "Flame Thrower", "Flamethrower", "ft_draw", 200, 200, null)
+	TF_WEAPONS(7, 0, "flamethrower", 40, null, "Backburner", null, "ft_draw", 200, 200, null)
+	TF_WEAPONS(7, 0, "flamethrower", 215, null, "Degreaser", null, "ft_draw", 200, 200, null)
+	TF_WEAPONS(7, 0, "flamethrower", 594, null, "Phlogistinator", "Phlog", "ft_draw", 200, 200, null)
+	TF_WEAPONS(7, 0, "flamethrower", 741, null, "Rainblower", null, "ft_draw", 200, 200, null)
+	TF_WEAPONS(7, 0, "rocketlauncher_fireball", 1178, null, "Dragon's Fury", null, "ft_draw", 200, 200, null)
+	TF_WEAPONS(7, 0, "flamethrower", 30474, null, "Nostromo Napalmer", "Alien Flamethrower", "ft_draw", 200, 200, null)
 	
 	TF_WEAPONS(7, 1, "shotgun_pyro", 12, null, "Pyro Shotgun", null, "draw", 6, 32, null)
 	TF_WEAPONS(7, 1, "flaregun", 39, null, "Flare Gun", "Flaregun", "fg_draw", 1, 16, null)
@@ -396,13 +405,13 @@ class TF_WEP_FEST
 //-----------------------------------------------------------------------------
 // Heavy
 //-----------------------------------------------------------------------------
-	TF_WEAPONS(6, 0, "minigun", 15, 202, "Minigun", "Sasha", "m_draw", 200, -1, null)
-	TF_WEAPONS(6, 0, "minigun", 41, null, "Natascha", null, "m_draw", 200, -1, null)
-	TF_WEAPONS(6, 0, "minigun", 298, null, "Iron Curtain", null, "m_draw", 200, -1, null)
-	TF_WEAPONS(6, 0, "minigun", 312, null, "Brass Beast", null, "m_draw", 200, -1, null)
-	TF_WEAPONS(6, 0, "minigun", 424, null, "Tomislav", null, "m_draw", 200, -1, null)
-	TF_WEAPONS(6, 0, "minigun", 811, 832, "Huo-Long Heater", "Heater", "m_draw", 200, -1, null)
-	TF_WEAPONS(6, 0, "minigun", 850, null, "Deflector", null, "m_draw", 200, -1, null)
+	TF_WEAPONS(6, 0, "minigun", 15, 202, "Minigun", "Sasha", "m_draw", 200, 200, null)
+	TF_WEAPONS(6, 0, "minigun", 41, null, "Natascha", null, "m_draw", 200, 200, null)
+	TF_WEAPONS(6, 0, "minigun", 298, null, "Iron Curtain", null, "m_draw", 200, 200, null)
+	TF_WEAPONS(6, 0, "minigun", 312, null, "Brass Beast", null, "m_draw", 200, 200, null)
+	TF_WEAPONS(6, 0, "minigun", 424, null, "Tomislav", null, "m_draw", 200, 200, null)
+	TF_WEAPONS(6, 0, "minigun", 811, 832, "Huo-Long Heater", "Heater", "m_draw", 200, 200, null)
+	TF_WEAPONS(6, 0, "minigun", 850, null, "Deflector", null, "m_draw", 200, 200, null)
 	
 	TF_WEAPONS(6, 1, "shotgun_hwg", 11, null, "Heavy Shotgun", null, "draw", 6, 32, null)
 	TF_WEAPONS(6, 1, "lunchbox", 42, null, "Sandvich", null, "sw_draw", 1, -1, null)
@@ -429,13 +438,13 @@ class TF_WEP_FEST
 //-----------------------------------------------------------------------------
 	TF_WEAPONS(9, 0, "shotgun_primary", 9, null, "Shotgun ", "Engineer Shotgun", "fj_draw", 6, 32, null)
 	TF_WEAPONS(9, 0, "sentry_revenge", 141, null, "Frontier Justice", "FJ", "fj_draw", 3, 32, null)
-	TF_WEAPONS(9, 0, "shotgun_primary", 527, null, "Widowmaker", null, "fj_draw", 200, -1, null)
+	TF_WEAPONS(9, 0, "shotgun_primary", 527, null, "Widowmaker", null, "fj_draw", 200, 200, null)
 	TF_WEAPONS(9, 0, "drg_pomson", 588, null, "Pomson 6000", "Pomson", "pomson_draw", 4, -1, null)
 	TF_WEAPONS(9, 0, "shotgun_building_rescue", 997, null, "Rescue Ranger", null, "fj_draw", 4, 20, null)
 	
 	TF_WEAPONS(0, 1, "pistol", 22, null, "Engineer Pistol", null, "pstl_draw", 12, 200, null)	//ID doesn't exist
 	TF_WEAPONS(9, 1, "laser_pointer", 140, null, "Wrangler", null, "wgl_draw", -1, -1, null)
-	TF_WEAPONS(9, 1, "mechanical_arm", 528, null, "Short Circuit", null, "pstl_draw", 200, -1, null)
+	TF_WEAPONS(9, 1, "mechanical_arm", 528, null, "Short Circuit", null, "pstl_draw", 200, 200, null)
 	
 	TF_WEAPONS(9, 2, "wrench", 7, 197, "Wrench", null, "pdq_draw", -1, -1, null)
 	TF_WEAPONS(9, 2, "robot_arm", 142, null, "Gunslinger", null, "gun_draw", -1, -1, null)
@@ -539,15 +548,15 @@ class TF_WEP_FEST
 	TF_WEAPONS_RESKIN(3, 0, "rocketlauncher", 800, 809, 889, 898, 907, 916, 965, 974, null, null, null, null, null, "dh_draw", 4, 20)
 	TF_WEAPONS_RESKIN(3, 0, "rocketlauncher", 15006, 15014, 15028, 15043, 15052, 15057, 15081, 15104, 15105, 15129, 15130, 15150, null, "dh_draw", 4, 20)
 	
-	TF_WEAPONS_RESKIN(7, 0, "flamethrower", 798, 807, 887, 896, 905, 914, 963, 972, null, null, null, null, null, "f_draw", 200, -1)
-	TF_WEAPONS_RESKIN(7, 0, "flamethrower", 15005, 15017, 15030, 15034, 15049, 15054, 15066, 15067, 15068, 15089, 15090, 15115, 15141, "f_draw", 200, -1)
+	TF_WEAPONS_RESKIN(7, 0, "flamethrower", 798, 807, 887, 896, 905, 914, 963, 972, null, null, null, null, null, "f_draw", 200, 200)
+	TF_WEAPONS_RESKIN(7, 0, "flamethrower", 15005, 15017, 15030, 15034, 15049, 15054, 15066, 15067, 15068, 15089, 15090, 15115, 15141, "f_draw", 200, 200)
 	
 	TF_WEAPONS_RESKIN(4, 0, "grenadelauncher", 15077, 15079, 15091, 15092, 15116, 15117, 15142, 15158, null, null, null, null, null, "g_draw", 4, 16)
 	TF_WEAPONS_RESKIN(4, 1, "pipebomblauncher", 797, 806, 886, 895, 904, 913, 962, 971, null, null, null, null, null, "sb_draw", 8, 24)
 	TF_WEAPONS_RESKIN(4, 1, "pipebomblauncher", 15009, 15012, 15024, 15038, 15045, 15048, 15082, 15083, 15084, 15113, 15137, 15138, 15155, "sb_draw", 8, 24)
 	
-	TF_WEAPONS_RESKIN(6, 0, "minigun", 882, 891, 900, 909, 958, 967, null, null, null, null, null, 15125, 15147, "m_draw", 200, -1)
-	TF_WEAPONS_RESKIN(6, 0, "minigun", 15004, 15020, 15026, 15031, 15040, 15055, 15086, 15087, 15088, 15098, 15099, 15123, 15124, "m_draw", 200, -1)
+	TF_WEAPONS_RESKIN(6, 0, "minigun", 882, 891, 900, 909, 958, 967, null, null, null, null, null, 15125, 15147, "m_draw", 200, 200)
+	TF_WEAPONS_RESKIN(6, 0, "minigun", 15004, 15020, 15026, 15031, 15040, 15055, 15086, 15087, 15088, 15098, 15099, 15123, 15124, "m_draw", 200, 200)
 	
 	TF_WEAPONS_RESKIN(9, 2, "wrench", 795, 804, 884, 893, 902, 911, 960, 969, null, null, null, null, null, "spk_draw", -1, -1)
 	TF_WEAPONS_RESKIN(9, 2, "wrench", 15073, 15074, 15075, 15139, 15140, 15114, 15156, 15158, null, null, null, null, null, "spk_draw", -1, -1)
@@ -580,8 +589,8 @@ class TF_WEP_FEST
 	TF_WEP_FEST(3, 0, "rocketlauncher", 1085, "Festive Black Box", null, "sg_draw", 3, 20, null)
 	TF_WEP_FEST(3, 1, "buff_item", 1001, "Festive Buff Banner", "Festive Buff", "bb_draw", -1, -1, "models/weapons/c_models/c_buffpack/c_buffpack_xmas.mdl")
 	
-	TF_WEP_FEST(7, 0, "flamethrower", 669, "Festive Flame Thrower", "Festive Flamethrower", "f_draw", 200, -1, null)
-	TF_WEP_FEST(7, 0, "flamethrower", 1146, "Festive Backburner", null, "f_draw", 200, -1, null)
+	TF_WEP_FEST(7, 0, "flamethrower", 669, "Festive Flame Thrower", "Festive Flamethrower", "f_draw", 200, 200, null)
+	TF_WEP_FEST(7, 0, "flamethrower", 1146, "Festive Backburner", null, "f_draw", 200, 200, null)
 	TF_WEP_FEST(7, 1, "flaregun", 1081, "Festive Flare Gun", "Festive Flaregun", "fg_draw", 16, -1, null)
 	TF_WEP_FEST(7, 2, "flaregun", 1000, "Festive Axtinguisher", null, "fa_draw", -1, -1, null)
 	
@@ -589,7 +598,7 @@ class TF_WEP_FEST
 	TF_WEP_FEST(4, 2, "pipebomblauncher", 661, "Festive Stickybomb Launcher", null, "sb_draw", 8, 24, null)
 	TF_WEP_FEST(4, 2, "sword", 1082, "Festive Eyelander", null, "cm_draw", -1, -1, null)
 	
-	TF_WEP_FEST(6, 0, "minigun", 654, "Festive Minigun", null, "m_draw", 200, -1, null)
+	TF_WEP_FEST(6, 0, "minigun", 654, "Festive Minigun", null, "m_draw", 200, 200, null)
 	TF_WEP_FEST(6, 1, "lunchbox", 1002, "Festive Sandvich", null, "sw_draw", 1, -1, null)
 	TF_WEP_FEST(6, 2, "fists", 1084, "Festive Gloves of Running Urgently", "Festive GRU", "bg_draw", -1, -1, null)
 	
